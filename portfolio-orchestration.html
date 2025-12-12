@@ -14,25 +14,18 @@
     var ua = navigator.userAgent || navigator.vendor || window.opera || "";
     var isMobile = /Mobi|Android|iP(ad|hone|od)|Tablet|Mobile|Phone/i.test(ua);
     
-    // Mobile blocked - show typing message on dark background
     if (isMobile) {
       document.write('<!DOCTYPE html><html class="mobile-blocked" style="margin:0!important;padding:0!important;background:#0d1117!important;"><head><meta name="viewport" content="width=device-width,initial-scale=1"><style>@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=swap");*,*::before,*::after{margin:0!important;padding:0!important;box-sizing:border-box;}html,body{height:100%!important;min-height:100%!important;background:#0d1117!important;overflow:hidden!important;}#mobile-blocked-screen{display:flex;position:fixed;inset:0;width:100vw;height:100vh;background:#0d1117;z-index:999999;align-items:center;justify-content:center;flex-direction:column;padding:20px;}#mobile-message-container{display:flex;align-items:center;max-width:90%;}#mobile-message-text{font-family:"JetBrains Mono",monospace;font-size:16px;color:#7ee787;line-height:1.8;text-align:center;white-space:pre-line;}#mobile-cursor{display:inline-block;width:10px;height:20px;background:#7ee787;margin-left:2px;animation:blink 1s infinite;align-self:flex-end;margin-bottom:3px;}@keyframes blink{0%,50%{opacity:1;}51%,100%{opacity:0;}}</style></head><body style="margin:0!important;padding:0!important;background:#0d1117!important;"><div id="mobile-blocked-screen"><div id="mobile-message-container"><span id="mobile-message-text"></span><span id="mobile-cursor"></span></div></div><script>var msg="Some things are worth sitting down for.\\nPlease use a desktop computer.";var el=document.getElementById("mobile-message-text");var i=0;function t(){if(i<msg.length){el.textContent+=msg.charAt(i);i++;setTimeout(t,30+Math.random()*50);}};setTimeout(t,500);<\/script></body></html>');
       document.close();
       return;
     }
     
-    // Browser detection - only allow Chrome and Firefox
-    // Chrome UA contains "Chrome" but not "Edg" (Edge), "OPR" (Opera), or "Brave"
-    // Firefox UA contains "Firefox"
-    // Safari UA contains "Safari" but NOT "Chrome"
     var isChrome = ua.indexOf('Chrome') !== -1 && ua.indexOf('Edg') === -1 && ua.indexOf('OPR') === -1 && ua.indexOf('Brave') === -1;
     var isFirefox = ua.indexOf('Firefox') !== -1;
     var isSupportedBrowser = isChrome || isFirefox;
     
-    // Block unsupported browsers (Safari, Edge, Opera, etc.) on desktop
     if (!isSupportedBrowser) {
       document.documentElement.classList.add("browser-blocked");
-      // Immediately write the blocked message to ensure it shows
       document.write('<!DOCTYPE html><html class="browser-blocked" style="margin:0!important;padding:0!important;background:#0d1117!important;"><head><meta name="viewport" content="width=device-width,initial-scale=1"><style>@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=swap");*,*::before,*::after{margin:0!important;padding:0!important;box-sizing:border-box;}html,body{height:100%!important;min-height:100%!important;background:#0d1117!important;overflow:hidden!important;}#browser-blocked-screen{display:flex;position:fixed;inset:0;width:100vw;height:100vh;background:#0d1117;z-index:999999;align-items:center;justify-content:center;flex-direction:column;}#browser-message-container{display:flex;align-items:center;}#browser-message-text{font-family:"JetBrains Mono",monospace;font-size:16px;color:#7ee787;line-height:1.8;white-space:pre-line;}#browser-cursor{display:inline-block;width:10px;height:20px;background:#7ee787;margin-left:2px;animation:blink 1s infinite;align-self:flex-end;margin-bottom:3px;}@keyframes blink{0%,50%{opacity:1;}51%,100%{opacity:0;}}</style></head><body style="margin:0!important;padding:0!important;background:#0d1117!important;"><div id="browser-blocked-screen"><div id="browser-message-container"><span id="browser-message-text"></span><span id="browser-cursor"></span></div></div><script>var msg="Safari and I are not on speaking terms yet.\\nPlease use Chrome or Firefox.";var el=document.getElementById("browser-message-text");var i=0;function t(){if(i<msg.length){el.textContent+=msg.charAt(i);i++;setTimeout(t,30+Math.random()*50);}};setTimeout(t,500);<\/script></body></html>');
       document.close();
     }
@@ -47,7 +40,6 @@
   --perspective-transition-duration: 2s;
 }
 
-/* ============ ANTI-COPY PROTECTION ============ */
 * {
   -webkit-user-select: none;
   -moz-user-select: none;
@@ -65,17 +57,12 @@ img, video {
   pointer-events: none;
 }
 
-/* Re-enable for input field */
 #intro-ai-input {
   -webkit-user-select: text;
   -moz-user-select: text;
   -ms-user-select: text;
   user-select: text;
 }
-
-/* ============ MOBILE BLOCKED - handled via document.write ============ */
-
-/* ============ BROWSER BLOCKED - handled via document.write ============ */
 
 .page-hidden * {
   animation-play-state: paused !important;
@@ -126,13 +113,11 @@ body {
   overflow: hidden;
 }
 
-/* Body gets white background only after code explanation fades */
 body.show-white-bg {
   background: white;
   margin: 2rem;
 }
 
-/* ============ CODE TYPING EXPLANATION ============ */
 #code-explanation {
   position: fixed;
   inset: 0;
@@ -153,6 +138,54 @@ body.show-white-bg {
 #code-explanation.fade-out {
   opacity: 0;
   pointer-events: none;
+}
+
+#github-button {
+  position: absolute;
+  top: 30px;
+  right: 50px;
+  padding: 12px 24px;
+  background: transparent;
+  border: 2px solid #7ee787;
+  border-radius: 12px;
+  color: white !important;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+  animation: flashBorder 1.5s ease-in-out infinite;
+  transition: all 0.3s ease;
+  z-index: 10011;
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
+}
+
+#github-button:link,
+#github-button:visited,
+#github-button:hover,
+#github-button:active {
+  color: white !important;
+}
+
+#github-button:hover {
+  background: rgba(126, 231, 135, 0.1);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(126, 231, 135, 0.3);
+}
+
+@keyframes flashBorder {
+  0%, 100% {
+    border-color: #7ee787;
+    box-shadow: 0 0 5px rgba(126, 231, 135, 0.5);
+  }
+  50% {
+    border-color: #4ec973;
+    box-shadow: 0 0 20px rgba(126, 231, 135, 0.8), 0 0 30px rgba(126, 231, 135, 0.4);
+  }
 }
 
 #code-lines {
@@ -445,7 +478,6 @@ body.show-white-bg {
   font-family: "Poppins", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
-/* FIX: Keep pointer-events none on the widget container, only button is clickable */
 #vibe-chat-widget.visible {
   opacity: 1;
   pointer-events: none;
@@ -456,14 +488,12 @@ body.show-white-bg {
   pointer-events: none;
 }
 
-/* Block ALL children of vibe-chat-widget by default */
 #vibe-chat-widget *,
 #vibe-chat-widget *::before,
 #vibe-chat-widget *::after {
   pointer-events: none !important;
 }
 
-/* ONLY the button is clickable, and ONLY when widget is visible */
 #vibe-chat-widget.visible #vibeTriggerButton {
   pointer-events: auto !important;
   cursor: pointer;
@@ -811,7 +841,6 @@ body.show-white-bg {
   font-family: "Poppins", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
-/* ============ INTRO VIDEO - COMPLETELY NON-CLICKABLE ============ */
 .intro-video-container {
   position: fixed;
   top: 0;
@@ -840,7 +869,6 @@ body.show-white-bg {
   pointer-events: none !important;
 }
 
-/* Ensure video wrapper is never clickable */
 .intro-video-container .video-wrapper {
   position: relative;
   display: flex;
@@ -866,7 +894,6 @@ body.show-white-bg {
   pointer-events: none !important;
 }
 
-/* Ensure video element is never clickable */
 .intro-video-container video {
   max-width: 90vw;
   max-height: 70vh;
@@ -894,7 +921,6 @@ body.show-white-bg {
   pointer-events: none !important;
 }
 
-/* Additional fallback - ensure ALL children of intro-video-container are non-clickable */
 .intro-video-container * {
   pointer-events: none !important;
 }
@@ -1159,7 +1185,6 @@ body.show-white-bg {
   }
 }
 
-/* ============ SAFARI WHEEL FIX - Full width and smooth animations ============ */
 .full-bleed-wrapper {
   position: fixed;
   top: 0;
@@ -1241,7 +1266,6 @@ body.show-white-bg {
   background: transparent;
   transition: transform 0.6s ease-out, opacity 0.5s ease-out;
   -webkit-transition: -webkit-transform 0.6s ease-out, opacity 0.5s ease-out;
-  /* Safari fix: will-change for smoother animations */
   will-change: transform, opacity;
   -webkit-will-change: transform, opacity;
 }
@@ -1274,7 +1298,6 @@ body.show-white-bg {
   transform: translateZ(0);
   -webkit-transform: translateZ(0);
   background: transparent;
-  /* Safari fix: smoother animations */
   will-change: transform, max-height;
   -webkit-will-change: transform, max-height;
   -webkit-backface-visibility: hidden;
@@ -1493,6 +1516,13 @@ body.show-white-bg {
     font-size: 9px;
     min-width: 18px;
   }
+
+  #github-button {
+    top: 20px;
+    right: 20px;
+    padding: 8px 16px;
+    font-size: 11px;
+  }
 }
 
 @media screen and (max-height: 480px) and (orientation: landscape) {
@@ -1652,8 +1682,8 @@ body.show-white-bg {
 </head>
 <body class="offset3" style="margin:0!important;padding:0!important;background:#0d1117!important;">
 
-<!-- Code Explanation Screen -->
 <div id="code-explanation">
+  <a id="github-button" href="https://github.com/katelaviolette1396/adaptive-portfolio" target="_blank" rel="noopener noreferrer">View Github codes</a>
   <div id="code-lines"></div>
   <div id="continue-prompt">
     <span id="spacebar-text">press space bar to continue</span>
@@ -1755,7 +1785,6 @@ body.show-white-bg {
     <div class="testimonial-widget" id="testimonialWidget">
       <div class="testimonial-container">
         <div class="images-row">
-          <!-- Position 1 -->
           <div class="image-container">
             <div class="image-container-inner">
               <img
@@ -1764,7 +1793,6 @@ body.show-white-bg {
               />
             </div>
           </div>
-          <!-- Position 2 -->
           <div class="image-container">
             <div class="image-container-inner">
               <video
@@ -1779,7 +1807,6 @@ body.show-white-bg {
               ></video>
             </div>
           </div>
-          <!-- Position 3: First testimonial -->
           <div class="image-container has-content">
             <div class="image-container-inner">
               <img
@@ -1788,7 +1815,6 @@ body.show-white-bg {
               />
             </div>
           </div>
-          <!-- Position 4 -->
           <div class="image-container">
             <div class="image-container-inner">
               <img
@@ -1797,7 +1823,6 @@ body.show-white-bg {
               />
             </div>
           </div>
-          <!-- Position 5 -->
           <div class="image-container">
             <div class="image-container-inner">
               <img
@@ -1806,7 +1831,6 @@ body.show-white-bg {
               />
             </div>
           </div>
-          <!-- Position 6: Second testimonial -->
           <div class="image-container has-content">
             <div class="image-container-inner">
               <img
@@ -1815,7 +1839,6 @@ body.show-white-bg {
               />
             </div>
           </div>
-          <!-- Position 7 -->
           <div class="image-container">
             <div class="image-container-inner">
               <video
@@ -1830,7 +1853,6 @@ body.show-white-bg {
               ></video>
             </div>
           </div>
-          <!-- Position 8 -->
           <div class="image-container">
             <div class="image-container-inner">
               <img
@@ -1839,7 +1861,6 @@ body.show-white-bg {
               />
             </div>
           </div>
-          <!-- Position 9: Third testimonial -->
           <div class="image-container has-content">
             <div class="image-container-inner">
               <img
@@ -1848,7 +1869,6 @@ body.show-white-bg {
               />
             </div>
           </div>
-          <!-- Position 10 -->
           <div class="image-container">
             <div class="image-container-inner">
               <img
@@ -1857,7 +1877,6 @@ body.show-white-bg {
               />
             </div>
           </div>
-          <!-- Position 11 -->
           <div class="image-container">
             <div class="image-container-inner">
               <img
@@ -1866,7 +1885,6 @@ body.show-white-bg {
               />
             </div>
           </div>
-          <!-- Position 12: Fourth testimonial -->
           <div class="image-container has-content">
             <div class="image-container-inner">
               <img
@@ -1875,7 +1893,6 @@ body.show-white-bg {
               />
             </div>
           </div>
-          <!-- Position 13 -->
           <div class="image-container">
             <div class="image-container-inner">
               <img
@@ -1884,7 +1901,6 @@ body.show-white-bg {
               />
             </div>
           </div>
-          <!-- Position 14 -->
           <div class="image-container">
             <div class="image-container-inner">
               <img
@@ -1893,7 +1909,6 @@ body.show-white-bg {
               />
             </div>
           </div>
-          <!-- Position 15: Fifth testimonial -->
           <div class="image-container has-content">
             <div class="image-container-inner">
               <img
@@ -1902,7 +1917,6 @@ body.show-white-bg {
               />
             </div>
           </div>
-          <!-- Position 16 -->
           <div class="image-container">
             <div class="image-container-inner">
               <img
@@ -1911,7 +1925,6 @@ body.show-white-bg {
               />
             </div>
           </div>
-          <!-- Position 17 -->
           <div class="image-container">
             <div class="image-container-inner">
               <img
@@ -1920,7 +1933,6 @@ body.show-white-bg {
               />
             </div>
           </div>
-          <!-- Position 18: Sixth testimonial -->
           <div class="image-container has-content">
             <div class="image-container-inner">
               <img
@@ -1929,7 +1941,6 @@ body.show-white-bg {
               />
             </div>
           </div>
-          <!-- Position 19: Seventh testimonial (video) -->
           <div class="image-container has-content">
             <div class="image-container-inner">
               <video
@@ -1969,7 +1980,6 @@ body.show-white-bg {
 </div>
 
 <script>
-// ============ ANTI-COPY PROTECTION ============
 document.addEventListener('contextmenu', e => e.preventDefault());
 document.addEventListener('copy', e => e.preventDefault());
 document.addEventListener('cut', e => e.preventDefault());
@@ -1988,15 +1998,11 @@ document.addEventListener('keydown', e => {
   }
 });
 
-// ============ GLOBAL CLICK BLOCKER FOR VIDEO AREA ============
-// This blocks ALL clicks except on the specific arrow button when conditions are met
 document.addEventListener('click', function(e) {
-  // Allow clicks on the intro AI input and send button
   if (e.target.id === 'intro-ai-input' || e.target.id === 'intro-ai-send') {
     return;
   }
   
-  // Check if clicking anywhere near the intro video container
   const introVideoContainer = document.getElementById('introVideoContainer');
   if (introVideoContainer && introVideoContainer.contains(e.target)) {
     console.log("BLOCKED: Click on intro video container");
@@ -2006,7 +2012,6 @@ document.addEventListener('click', function(e) {
     return false;
   }
   
-  // Check if clicking anywhere in the vibe chat widget EXCEPT the button
   const vibeChatWidget = document.getElementById('vibe-chat-widget');
   const vibeTriggerBtn = document.getElementById('vibeTriggerButton');
   if (vibeChatWidget && vibeChatWidget.contains(e.target) && e.target !== vibeTriggerBtn) {
@@ -2016,12 +2021,10 @@ document.addEventListener('click', function(e) {
     e.stopImmediatePropagation();
     return false;
   }
-}, true); // Capture phase to block before bubbling
+}, true);
 
-// Also block mousedown and touchstart for extra protection
 ['mousedown', 'touchstart'].forEach(function(eventType) {
   document.addEventListener(eventType, function(e) {
-    // Allow on intro AI input and send button
     if (e.target.id === 'intro-ai-input' || e.target.id === 'intro-ai-send') {
       return;
     }
@@ -2045,7 +2048,6 @@ document.addEventListener('click', function(e) {
   }, true);
 });
 
-// ============ GLOBAL TYPING FUNCTION ============
 function typeTextGlobal(element, fullText, speed, onComplete) {
   let index = 0;
   function step() {
@@ -2061,7 +2063,6 @@ function typeTextGlobal(element, fullText, speed, onComplete) {
   step();
 }
 
-// ============ CODE TYPING EXPLANATION ============
 const codeLines = [
   { type: 'comment', text: '// ADAPTIVE PORTFOLIO — Work in Progress' },
   { type: 'comment', text: '// An experiment in human-centered AI interaction' },
@@ -2146,7 +2147,6 @@ function createCodeLine(lineNum, content, type) {
 
 function typeNextLine() {
   if (currentLineIndex >= codeLines.length) {
-    // All lines typed, show continue prompt
     setTimeout(() => {
       continuePrompt.classList.add('visible');
       codeExplanationComplete = true;
@@ -2159,17 +2159,14 @@ function typeNextLine() {
   const lineElement = createCodeLine(currentLineIndex + 1, lineData.text, lineData.type);
   codeLinesContainer.appendChild(lineElement);
   
-  // Trigger animation
   setTimeout(() => {
     lineElement.classList.add('visible');
   }, 50);
   
-  // Auto-scroll to bottom
   codeLinesContainer.scrollTop = codeLinesContainer.scrollHeight;
   
   currentLineIndex++;
   
-  // Determine delay for next line
   let delay;
   if (lineData.type === 'blank') {
     delay = 150;
@@ -2182,16 +2179,12 @@ function typeNextLine() {
   setTimeout(typeNextLine, delay);
 }
 
-// Start typing after a brief delay
 setTimeout(typeNextLine, 800);
 
-// Spacebar handler for continuing
 let spacebarEnabled = false;
 
 document.addEventListener('keydown', (e) => {
-  // Allow skipping with any key press after first few lines (except spacebar)
   if (currentLineIndex > 5 && currentLineIndex < codeLines.length && e.key !== ' ') {
-    // Speed up - show all remaining lines
     while (currentLineIndex < codeLines.length) {
       const lineData = codeLines[currentLineIndex];
       const lineElement = createCodeLine(currentLineIndex + 1, lineData.text, lineData.type);
@@ -2199,19 +2192,16 @@ document.addEventListener('keydown', (e) => {
       lineElement.classList.add('visible');
       currentLineIndex++;
     }
-    // Scroll to bottom
     codeLinesContainer.scrollTop = codeLinesContainer.scrollHeight;
     continuePrompt.classList.add('visible');
     codeExplanationComplete = true;
     spacebarEnabled = true;
   }
   
-  // Spacebar to continue after intro is complete
   if (e.key === ' ' && spacebarEnabled && codeExplanationComplete) {
     e.preventDefault();
-    spacebarEnabled = false; // Prevent double-trigger
+    spacebarEnabled = false;
     
-    // Switch to white background immediately
     document.documentElement.style.cssText = 'margin:0!important;padding:0!important;background:white!important;';
     document.body.style.cssText = 'margin:0!important;padding:0!important;background:white!important;min-height:100vh;overflow:hidden;';
     document.body.classList.add('show-white-bg');
@@ -2219,21 +2209,17 @@ document.addEventListener('keydown', (e) => {
     codeExplanation.classList.add('fade-out');
     setTimeout(() => {
       codeExplanation.style.display = 'none';
-      // Start the original AI chat sequence
       startAIChatSequence();
     }, 1500);
   }
 });
 
-// ============ ORIGINAL AI CHAT SEQUENCE ============
 function startAIChatSequence() {
   const introWidget = document.getElementById("intro-ai-widget");
   const messagesEl = document.getElementById("intro-ai-messages");
   const inputEl = document.getElementById("intro-ai-input");
   const sendBtn = document.getElementById("intro-ai-send");
   const inputRow = document.getElementById("intro-ai-input-row");
-  const introVideoContainer = document.getElementById("introVideoContainer");
-  const introVideo = document.getElementById("introVideo");
 
   const STORAGE_KEY = "intro_user_name";
   let nameGiven = false;
@@ -2407,7 +2393,6 @@ function startAIChatSequence() {
     nameGiven = true;
     chatCompleted = true;
     
-    // Switch to white background for video phase
     document.documentElement.style.cssText = 'margin:0!important;padding:0!important;background:white!important;';
     document.body.style.cssText = 'margin:2rem!important;padding:0!important;background:white!important;min-height:100vh;overflow:hidden;';
     document.body.classList.add('show-white-bg');
@@ -2415,7 +2400,12 @@ function startAIChatSequence() {
     setTimeout(() => {
       introWidget.classList.remove("fade-in");
       introWidget.classList.add("fade-out");
+      
+      setupVideoEventListeners();
+      
       introVideoContainer.classList.add("visible");
+      const introVideo = document.getElementById("introVideo");
+      introVideo.currentTime = 0;
       const playPromise = introVideo.play();
       if (playPromise !== undefined) playPromise.catch(() => {});
       setTimeout(() => {
@@ -2528,11 +2518,9 @@ function startStrudelAudio() {
   
   strudelIsPlaying = true;
   
-  // If iframe src is blank or missing, reload it first
   if (!strudelFrame.src || strudelFrame.src === "about:blank") {
     strudelFrame.src = strudelOriginalSrc;
     strudelFrame.onload = function() {
-      // Wait a moment for the iframe content to initialize, then send start message
       setTimeout(() => {
         if (strudelFrame.contentWindow) {
           strudelFrame.contentWindow.postMessage("startStrudel", "*");
@@ -2541,7 +2529,6 @@ function startStrudelAudio() {
       }, 500);
     };
   } else {
-    // Iframe already has src, just send the start message
     if (strudelFrame.contentWindow) {
       strudelFrame.contentWindow.postMessage("startStrudel", "*");
       strudelFrame.contentWindow.postMessage({ type: "setMoodSlider", value: currentMoodValue }, "*");
@@ -2570,7 +2557,6 @@ function pauseStrudelAudio() {
       strudelFrame.src = "about:blank";
     }
   }
-  // Also pause intro video when strudel pauses
   const introVideo = document.getElementById("introVideo");
   if (introVideo) {
     introVideo.pause();
@@ -2603,32 +2589,27 @@ function handleStrudelEnded() {
   if (strudelHasEnded) return;
   strudelHasEnded = true;
   
-  // Fade out strudel
   const strudelContainer = document.getElementById("strudelContainer");
   if (strudelContainer) {
     strudelContainer.classList.remove("visible");
   }
   pauseStrudelAudio();
   
-  // Hide the video container
   const introVideoContainer = document.getElementById("introVideoContainer");
   if (introVideoContainer) {
     introVideoContainer.classList.remove("visible");
   }
   
-  // Hide the mood slider container
   const moodSliderContainer = document.getElementById("mood-slider-container");
   if (moodSliderContainer) {
     moodSliderContainer.classList.remove("visible");
   }
   
-  // Hide vibe chat widget
   const vibeChatWidget = document.getElementById("vibe-chat-widget");
   if (vibeChatWidget) {
     vibeChatWidget.classList.remove("visible");
   }
   
-  // Bring wheel back down after strudel fades
   setTimeout(() => {
     const testimonialWidget = document.getElementById("testimonialWidget");
     const mainContainer = document.getElementById("mainContainer");
@@ -2641,19 +2622,15 @@ function handleStrudelEnded() {
       mainContainer.classList.remove("fade-out-for-perspective");
     }
     
-    // Show info message after wheel comes down
     setTimeout(() => {
-      // Trigger the AI chat widget to open with the post-strudel message
       if (typeof openChatWithMessage === 'function') {
         openChatWithMessage("Personalized portfolio coming soon. In the meantime, let me know what you'd like to see.");
       }
       
-      // Start wheel rotation - spotlight center card first, then rotate through all
       wheelStopped = false;
       wheelHasSlid = false;
       if (!pageFrozen && wheelInitialized) {
         clearNextRotation();
-        // Spotlight the front/center card first without rotating
         nextRotationTimeout = setTimeout(() => {
           if (wheelStopped || pageFrozen) return;
           const frontIdx = findFrontCardIndex();
@@ -2675,7 +2652,6 @@ function handleStrudelEnded() {
 window.addEventListener("message", (event) => {
   const data = event.data;
   
-  // Listen for pause signals from strudel
   if (data === "pause" || 
       (data && typeof data === "object" && data.type === "pause")) {
     const introVideo = document.getElementById("introVideo");
@@ -2684,7 +2660,6 @@ window.addEventListener("message", (event) => {
     }
   }
   
-  // Listen for resume signals from strudel
   if (data === "resume" || 
       (data && typeof data === "object" && data.type === "resume")) {
     const introVideo = document.getElementById("introVideo");
@@ -2693,7 +2668,6 @@ window.addEventListener("message", (event) => {
     }
   }
   
-  // Listen for strudelEnded
   if (data === "strudelEnded" || 
       (data && typeof data === "object" && data.type === "strudelEnded")) {
     handleStrudelEnded();
@@ -2729,51 +2703,76 @@ let hasTriggeredSlideUp = false;
 let pendingDirection = null;
 let wheelIntroMessageShown = false;
 
-introVideo.addEventListener("timeupdate", () => {
-  if (!chatCompleted) return;
-  if (!wheelInitialized && introVideo.currentTime >= 9) {
-    wheelInitialized = true;
-    mainContent.classList.add("visible");
-    initializeWheel();
-    // Intro message will be shown later at 13 seconds
-  }
-  // Show the intro message at 13 seconds (after wheel has been running a bit)
-  if (!wheelIntroMessageShown && introVideo.currentTime >= 13) {
-    wheelIntroMessageShown = true;
-    const wheelIntroMessage = document.getElementById("wheelIntroMessage");
-    const wheelIntroText = document.getElementById("wheelIntroText");
-    if (wheelIntroMessage) {
-      wheelIntroMessage.classList.add("visible");
-      if (wheelIntroText) {
-        wheelIntroText.textContent = "";
-        // Wait for fade-in to complete (1.5s) then start typing
-        setTimeout(() => {
-          typeTextGlobal(wheelIntroText, "Let's personalize how you experience these projects.", 30);
-        }, 1800);
+function setupVideoEventListeners() {
+  const introVideo = document.getElementById("introVideo");
+  
+  introVideo.addEventListener("timeupdate", () => {
+    if (!chatCompleted) return;
+    if (!wheelInitialized && introVideo.currentTime >= 9) {
+      wheelInitialized = true;
+      mainContent.classList.add("visible");
+      initializeWheel();
+    }
+    if (!wheelIntroMessageShown && introVideo.currentTime >= 13) {
+      wheelIntroMessageShown = true;
+      const wheelIntroMessage = document.getElementById("wheelIntroMessage");
+      const wheelIntroText = document.getElementById("wheelIntroText");
+      if (wheelIntroMessage) {
+        wheelIntroMessage.classList.add("visible");
+        if (wheelIntroText) {
+          wheelIntroText.textContent = "";
+          setTimeout(() => {
+            typeTextGlobal(wheelIntroText, "Let's personalize how you experience these projects.", 30);
+          }, 1800);
+        }
       }
     }
-  }
-  if (!wheelMovedAt24 && introVideo.currentTime >= 24) {
-    wheelMovedAt24 = true;
-    wheelStopped = true;
-    clearNextRotation();
-    const testimonialWidget = document.getElementById("testimonialWidget");
-    const mainContainer = document.getElementById("mainContainer");
-    mainContainer.classList.add("slide-up-out");
-    testimonialWidget.classList.add("slide-up");
-    // Hide the intro message
-    const wheelIntroMessage = document.getElementById("wheelIntroMessage");
-    if (wheelIntroMessage) {
-      wheelIntroMessage.classList.remove("visible");
+    if (!wheelMovedAt24 && introVideo.currentTime >= 24) {
+      wheelMovedAt24 = true;
+      wheelStopped = true;
+      clearNextRotation();
+      const testimonialWidget = document.getElementById("testimonialWidget");
+      const mainContainer = document.getElementById("mainContainer");
+      mainContainer.classList.add("slide-up-out");
+      testimonialWidget.classList.add("slide-up");
+      const wheelIntroMessage = document.getElementById("wheelIntroMessage");
+      if (wheelIntroMessage) {
+        wheelIntroMessage.classList.remove("visible");
+      }
     }
-  }
-  if (!elementsShownAt29 && introVideo.currentTime >= 29.6) {
-    elementsShownAt29 = true;
-    introVideo.pause();
-    showVibeChatWidget();
-    // Strudel visual is now shown when the arrow button is pressed instead
-  }
-});
+    if (!elementsShownAt29 && introVideo.currentTime >= 29.6) {
+      elementsShownAt29 = true;
+      introVideo.pause();
+      showVibeChatWidget();
+    }
+  });
+
+  introVideo.addEventListener("ended", () => {
+    if (!chatCompleted) return;
+    introVideoContainer.classList.remove("visible");
+    if (introComplete) return;
+    introComplete = true;
+    introVideoContainer.style.background = "transparent";
+    if (!wheelInitialized) {
+      wheelInitialized = true;
+      mainContent.classList.add("visible");
+      initializeWheel();
+      setTimeout(() => {
+        const wheelIntroMessage = document.getElementById("wheelIntroMessage");
+        const wheelIntroText = document.getElementById("wheelIntroText");
+        if (wheelIntroMessage) {
+          wheelIntroMessage.classList.add("visible");
+          if (wheelIntroText) {
+            wheelIntroText.textContent = "";
+            setTimeout(() => {
+              typeTextGlobal(wheelIntroText, "Let's personalize how you experience these projects.", 30);
+            }, 1800);
+          }
+        }
+      }, 4000);
+    }
+  });
+}
 
 let vibeSliderHasBeenMoved = false;
 
@@ -2784,11 +2783,9 @@ function showVibeChatWidget() {
   
   vibeChatWidget.classList.add("visible");
   
-  // CRITICAL: Now and ONLY now allow button clicks
   buttonClickAllowed = true;
   console.log("buttonClickAllowed set to TRUE");
   
-  // Enable the button element itself
   if (triggerBtn) {
     triggerBtn.disabled = false;
     triggerBtn.removeAttribute("aria-disabled");
@@ -2797,7 +2794,6 @@ function showVibeChatWidget() {
   
   if (vibeChatText) {
     vibeChatText.textContent = "";
-    // Wait for fade-in to complete (1.5s) then start typing
     setTimeout(() => {
       typeTextGlobal(vibeChatText, "Click to get started.", 30);
     }, 1800);
@@ -2805,8 +2801,6 @@ function showVibeChatWidget() {
 }
 
 function triggerVibeStart() {
-  // CRITICAL GUARD: Only allow if we've reached the right point in the video
-  // and the vibe chat widget is actually visible
   if (!elementsShownAt29) {
     console.log("triggerVibeStart blocked: elementsShownAt29 is false");
     return;
@@ -2826,11 +2820,9 @@ function triggerVibeStart() {
   if (vibeSliderHasBeenMoved) return;
   vibeSliderHasBeenMoved = true;
   
-  // Disable further button clicks
   buttonClickAllowed = false;
   console.log("buttonClickAllowed set to FALSE");
   
-  // Disable the button element
   const triggerBtn = document.getElementById("vibeTriggerButton");
   if (triggerBtn) {
     triggerBtn.disabled = true;
@@ -2838,11 +2830,12 @@ function triggerVibeStart() {
     console.log("Button element DISABLED");
   }
   
-  // Fade out the vibe chat widget
   vibeChatWidget.classList.remove("visible");
   
   introVideoContainer.classList.add("video-grow-on-resume");
-  introVideo.play();
+  requestAnimationFrame(() => {
+    introVideo.play();
+  });
   showStrudelVisual();
   startStrudelAudio();
   wheelStopped = true;
@@ -2853,196 +2846,6 @@ const btnPlay = document.getElementById("btn-play");
 if (btnPlay) {
   btnPlay.style.display = "none";
 }
-
-introVideo.addEventListener("ended", () => {
-  if (!chatCompleted) return;
-  introVideoContainer.classList.remove("visible");
-  if (introComplete) return;
-  introComplete = true;
-  introVideoContainer.style.background = "transparent";
-  if (!wheelInitialized) {
-    wheelInitialized = true;
-    mainContent.classList.add("visible");
-    initializeWheel();
-    // Show the intro message after a delay
-    setTimeout(() => {
-      const wheelIntroMessage = document.getElementById("wheelIntroMessage");
-      const wheelIntroText = document.getElementById("wheelIntroText");
-      if (wheelIntroMessage) {
-        wheelIntroMessage.classList.add("visible");
-        if (wheelIntroText) {
-          wheelIntroText.textContent = "";
-          // Wait for fade-in to complete (1.5s) then start typing
-          setTimeout(() => {
-            typeTextGlobal(wheelIntroText, "Let's personalize how you experience these projects.", 30);
-          }, 1800);
-        }
-      }
-    }, 4000);
-  }
-});
-
-setTimeout(() => {
-  if (!chatCompleted) return;
-  if (!wheelInitialized && introVideo.readyState < 2) {
-    wheelInitialized = true;
-    introComplete = true;
-    introVideoContainer.style.background = "transparent";
-    mainContent.classList.add("visible");
-    initializeWheel();
-    // Show the intro message after a delay
-    setTimeout(() => {
-      const wheelIntroMessage = document.getElementById("wheelIntroMessage");
-      const wheelIntroText = document.getElementById("wheelIntroText");
-      if (wheelIntroMessage) {
-        wheelIntroMessage.classList.add("visible");
-        if (wheelIntroText) {
-          wheelIntroText.textContent = "";
-          // Wait for fade-in to complete (1.5s) then start typing
-          setTimeout(() => {
-            typeTextGlobal(wheelIntroText, "Let's personalize how you experience these projects.", 30);
-          }, 1800);
-        }
-      }
-    }, 4000);
-  }
-}, 20000);
-
-const whiteOverlay = document.getElementById("whiteOverlay");
-const closeButton = document.getElementById("closeButton");
-const overlayTitle = document.getElementById("overlayTitle");
-const rectGrid = document.getElementById("rectGrid");
-const OVERLAY_FADE_MS = 1600;
-const X_APPEAR_DELAY_MS = 600;
-let xRevealTimer = null;
-
-function clearXTimer() {
-  if (xRevealTimer) {
-    clearTimeout(xRevealTimer);
-    xRevealTimer = null;
-  }
-}
-function spinOnce(el) {
-  if (!el) return;
-  el.classList.add("spin");
-  setTimeout(() => el.classList.remove("spin"), 360);
-}
-function arrowUpSVG() {
-  return '<svg aria-hidden="true" width="1em" height="1em" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg"><g fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 28 V16"></path><path d="M8 24 L20 12 L32 24"></path></g></svg>';
-}
-function syncCloseButtonY() {
-  const y = whiteOverlay.scrollTop || 0;
-  closeButton.style.setProperty("--scrollY", y + "px");
-}
-
-let rectExpanded = false;
-let rectAnimating = false;
-let selectedRect = null;
-let savedTransforms = new Map();
-
-function resetOverlayGrid() {
-  whiteOverlay.classList.remove("closing", "expanded", "expanding");
-  overlayTitle.classList.remove("fade-out", "quick");
-  closeButton.innerHTML = "&times;";
-  closeButton.setAttribute("aria-label", "Close overlay");
-  const rects = Array.from(rectGrid.querySelectorAll(".rect"));
-  rects.forEach((r) => {
-    r.classList.remove("selected");
-    r.style.transform = "";
-    r.style.opacity = "";
-  });
-  rectExpanded = false;
-  rectAnimating = false;
-  selectedRect = null;
-  savedTransforms.clear();
-  closeButton.style.setProperty("--scrollY", "0px");
-}
-
-function getRectCenterTopTarget() {
-  const gridBox = rectGrid.getBoundingClientRect();
-  const cs = getComputedStyle(rectGrid);
-  const padTop = parseFloat(cs.paddingTop) || 0;
-  return { x: gridBox.left + gridBox.width / 2, y: gridBox.top + padTop };
-}
-
-function expandRect(rect) {
-  if (rectAnimating || rectExpanded) return;
-  rectAnimating = true;
-  selectedRect = rect;
-  const rects = Array.from(rectGrid.querySelectorAll(".rect"));
-  rects.forEach((r) => savedTransforms.set(r, r.style.transform || ""));
-  whiteOverlay.classList.add("expanding");
-  rect.classList.add("selected");
-  const from = rect.getBoundingClientRect();
-  const gridBox = rectGrid.getBoundingClientRect();
-  const targetTopCenter = getRectCenterTopTarget();
-  const dx = targetTopCenter.x - (from.left + from.width / 2);
-  const dy = targetTopCenter.y - from.top;
-  const scaleX = gridBox.width / from.width;
-  const scaleY = gridBox.height / from.height;
-  rect.style.transform =
-    "translate3d(" +
-    dx +
-    "px, " +
-    dy +
-    "px, 0) scale(" +
-    scaleX +
-    ", " +
-    scaleY +
-    ")";
-  const onDone = (e) => {
-    if (e.propertyName !== "transform") return;
-    rect.removeEventListener("transitionend", onDone);
-    whiteOverlay.classList.remove("expanding");
-    whiteOverlay.classList.add("expanded");
-    closeButton.innerHTML = arrowUpSVG();
-    closeButton.setAttribute("aria-label", "Collapse");
-    rectExpanded = true;
-    rectAnimating = false;
-    syncCloseButtonY();
-  };
-  rect.addEventListener("transitionend", onDone, { once: true });
-}
-
-function reverseRectExpansion() {
-  if (rectAnimating || !rectExpanded) return;
-  rectAnimating = true;
-  const rects = Array.from(rectGrid.querySelectorAll(".rect"));
-  const rect = selectedRect;
-  const others = rects.filter((r) => r !== rect);
-  others.forEach((r) => {
-    r.style.transition = "none";
-    r.style.transform = savedTransforms.get(r) || "";
-    r.style.opacity = "1";
-  });
-  void rectGrid.offsetHeight;
-  others.forEach((r) => {
-    r.style.transition = "";
-  });
-  const original = savedTransforms.get(rect) || "";
-  rect.style.transform = original;
-  rect.style.opacity = "";
-  const onBack = (e) => {
-    if (e.propertyName !== "transform") return;
-    rect.removeEventListener("transitionend", onBack);
-    whiteOverlay.classList.remove("expanded");
-    rect.classList.remove("selected");
-    savedTransforms.clear();
-    closeButton.innerHTML = "&times;";
-    closeButton.setAttribute("aria-label", "Close overlay");
-    rectExpanded = false;
-    rectAnimating = false;
-    syncCloseButtonY();
-  };
-  rect.addEventListener("transitionend", onBack, { once: true });
-}
-
-rectGrid.addEventListener("click", (e) => {
-  if (rectAnimating || rectExpanded) return;
-  const target = e.target.closest(".rect");
-  if (!target) return;
-  expandRect(target);
-});
 
 const closeOverlay = () => {
   clearXTimer();
@@ -3064,34 +2867,6 @@ const closeOverlay = () => {
     closeButton.style.setProperty("--scrollY", "0px");
   }, OVERLAY_FADE_MS);
 };
-
-whiteOverlay.addEventListener("transitionend", (e) => {
-  if (e.propertyName !== "opacity") return;
-  const isActive = whiteOverlay.classList.contains("active");
-  if (!isActive) {
-    closeButton.classList.remove("revealed");
-    if (rectExpanded || rectAnimating) {
-      reverseRectExpansion();
-      closeButton.innerHTML = "&times;";
-      closeButton.setAttribute("aria-label", "Close overlay");
-      whiteOverlay.classList.remove("expanded", "expanding");
-      rectExpanded = false;
-      rectAnimating = false;
-    }
-  }
-});
-
-whiteOverlay.addEventListener("scroll", syncCloseButtonY, { passive: true });
-closeButton && closeButton.addEventListener("pointerdown", () => spinOnce(closeButton));
-closeButton && closeButton.addEventListener("click", closeOverlay);
-closeButton &&
-  closeButton.addEventListener("keydown", (e) => {
-    if (e.key === "Enter" || e.key === " ") {
-      e.preventDefault();
-      spinOnce(closeButton);
-      closeOverlay();
-    }
-  });
 
 function hardAutoplaySeventh() {
   const video = document.getElementById("seventhVideo");
@@ -3308,7 +3083,6 @@ function spotlightCard(card, after) {
   if (pageFrozen) return;
   const inner = card.querySelector(".image-container-inner");
   const media = inner ? inner.querySelector("img, video") : null;
-  // Only skip certain testimonials during intro video, not after strudel
   if (
     introVideo &&
     introVideo.paused &&
@@ -3362,7 +3136,6 @@ function spotlightCard(card, after) {
   const offsetX = -(targetWidth - currentWidth) / 2;
   const offsetY = -(targetHeight - currentHeight) / 2;
   
-  // Safari fix: use webkit prefix for transitions
   media.style.webkitTransition =
     "max-height " +
     GROW_DURATION +
@@ -3447,15 +3220,13 @@ function layoutCircularWheel() {
     if (card.classList.contains("has-content")) contentIndices.push(idx);
   });
   
-  // Safari fix: Get the actual center of the images-row container
   const rowRect = row.getBoundingClientRect();
   const centerX = rowRect.width / 2;
   
   wheelCards.forEach((card) => {
-    // Position cards relative to the center of the row
     card.style.left = centerX + "px";
     card.style.top = "50%";
-    card.style.marginLeft = "-5rem"; // Offset for card width
+    card.style.marginLeft = "-5rem";
   });
   applyWheelTransforms();
 }
@@ -3578,7 +3349,6 @@ function initializeWheel() {
       container.style.opacity = "1";
     }, sortedIndex * STAGGER_MS);
   });
-  // Start by spotlighting the front/center card, then rotate through all in order
   nextRotationTimeout = setTimeout(() => {
     if (wheelStopped) return;
     const frontIdx = findFrontCardIndex();
@@ -3689,11 +3459,8 @@ vibeLabels.forEach((label) => {
   });
 });
 
-// ============ BULLETPROOF CLICK BLOCKING ============
-// This flag is the ONLY way to allow the button click
 let buttonClickAllowed = false;
 
-// Block ALL clicks on the intro video container at JavaScript level
 const introVideoContainerBlock = document.getElementById("introVideoContainer");
 if (introVideoContainerBlock) {
   ['click', 'mousedown', 'mouseup', 'touchstart', 'touchend', 'pointerdown', 'pointerup'].forEach(eventType => {
@@ -3702,19 +3469,17 @@ if (introVideoContainerBlock) {
       e.stopPropagation();
       e.stopImmediatePropagation();
       return false;
-    }, true); // Capture phase
+    }, true);
   });
 }
 
-// Block clicks on vibe-chat-widget body (not the button)
 const vibeChatBody = document.getElementById("vibe-chat-body");
 const vibeChatMessage = document.getElementById("vibe-chat-message");
 if (vibeChatBody) {
   ['click', 'mousedown', 'mouseup', 'touchstart', 'touchend', 'pointerdown', 'pointerup'].forEach(eventType => {
     vibeChatBody.addEventListener(eventType, function(e) {
-      // Only allow if clicking the actual button
       if (e.target.id === 'vibeTriggerButton') {
-        return; // Allow button clicks through
+        return;
       }
       e.preventDefault();
       e.stopPropagation();
@@ -3734,12 +3499,8 @@ if (vibeChatMessage) {
   });
 }
 
-// DOCUMENT-LEVEL CLICK INTERCEPTOR
-// This catches ALL clicks and only allows the button through when conditions are right
 document.addEventListener('click', function(e) {
-  // If clicking the arrow button
   if (e.target.id === 'vibeTriggerButton' || e.target.closest('#vibeTriggerButton')) {
-    // Check if button click is allowed
     if (!buttonClickAllowed) {
       console.log("Document interceptor: button click NOT allowed yet");
       e.preventDefault();
@@ -3747,11 +3508,9 @@ document.addEventListener('click', function(e) {
       e.stopImmediatePropagation();
       return false;
     }
-    // Otherwise allow it through
     return;
   }
   
-  // Block clicks on video container area
   if (e.target.closest('#introVideoContainer') || e.target.closest('#vibe-chat-widget')) {
     if (e.target.id !== 'vibeTriggerButton') {
       e.preventDefault();
@@ -3759,13 +3518,11 @@ document.addEventListener('click', function(e) {
       return false;
     }
   }
-}, true); // Capture phase - runs BEFORE other handlers
+}, true);
 
-// Arrow button to trigger Strudel - ONLY way to start it
 const vibeTriggerButton = document.getElementById("vibeTriggerButton");
 if (vibeTriggerButton) {
   vibeTriggerButton.addEventListener("click", function (e) {
-    // CRITICAL: Triple-check all conditions
     if (!buttonClickAllowed) {
       console.log("Button handler: buttonClickAllowed is false");
       e.preventDefault();
@@ -3788,11 +3545,174 @@ if (vibeTriggerButton) {
       return false;
     }
     
-    // All checks passed - trigger the start
     console.log("Button click ALLOWED - triggering vibe start");
     triggerVibeStart();
-  }, false); // Bubble phase
+  }, false);
 }
+
+const whiteOverlay = document.getElementById("whiteOverlay");
+const closeButton = document.getElementById("closeButton");
+const overlayTitle = document.getElementById("overlayTitle");
+const rectGrid = document.getElementById("rectGrid");
+const OVERLAY_FADE_MS = 1600;
+const X_APPEAR_DELAY_MS = 600;
+let xRevealTimer = null;
+
+function clearXTimer() {
+  if (xRevealTimer) {
+    clearTimeout(xRevealTimer);
+    xRevealTimer = null;
+  }
+}
+function spinOnce(el) {
+  if (!el) return;
+  el.classList.add("spin");
+  setTimeout(() => el.classList.remove("spin"), 360);
+}
+function arrowUpSVG() {
+  return '<svg aria-hidden="true" width="1em" height="1em" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg"><g fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 28 V16"></path><path d="M8 24 L20 12 L32 24"></path></g></svg>';
+}
+function syncCloseButtonY() {
+  const y = whiteOverlay.scrollTop || 0;
+  closeButton.style.setProperty("--scrollY", y + "px");
+}
+
+let rectExpanded = false;
+let rectAnimating = false;
+let selectedRect = null;
+let savedTransforms = new Map();
+
+function resetOverlayGrid() {
+  whiteOverlay.classList.remove("closing", "expanded", "expanding");
+  overlayTitle.classList.remove("fade-out", "quick");
+  closeButton.innerHTML = "&times;";
+  closeButton.setAttribute("aria-label", "Close overlay");
+  const rects = Array.from(rectGrid.querySelectorAll(".rect"));
+  rects.forEach((r) => {
+    r.classList.remove("selected");
+    r.style.transform = "";
+    r.style.opacity = "";
+  });
+  rectExpanded = false;
+  rectAnimating = false;
+  selectedRect = null;
+  savedTransforms.clear();
+  closeButton.style.setProperty("--scrollY", "0px");
+}
+
+function getRectCenterTopTarget() {
+  const gridBox = rectGrid.getBoundingClientRect();
+  const cs = getComputedStyle(rectGrid);
+  const padTop = parseFloat(cs.paddingTop) || 0;
+  return { x: gridBox.left + gridBox.width / 2, y: gridBox.top + padTop };
+}
+
+function expandRect(rect) {
+  if (rectAnimating || rectExpanded) return;
+  rectAnimating = true;
+  selectedRect = rect;
+  const rects = Array.from(rectGrid.querySelectorAll(".rect"));
+  rects.forEach((r) => savedTransforms.set(r, r.style.transform || ""));
+  whiteOverlay.classList.add("expanding");
+  rect.classList.add("selected");
+  const from = rect.getBoundingClientRect();
+  const gridBox = rectGrid.getBoundingClientRect();
+  const targetTopCenter = getRectCenterTopTarget();
+  const dx = targetTopCenter.x - (from.left + from.width / 2);
+  const dy = targetTopCenter.y - from.top;
+  const scaleX = gridBox.width / from.width;
+  const scaleY = gridBox.height / from.height;
+  rect.style.transform =
+    "translate3d(" +
+    dx +
+    "px, " +
+    dy +
+    "px, 0) scale(" +
+    scaleX +
+    ", " +
+    scaleY +
+    ")";
+  const onDone = (e) => {
+    if (e.propertyName !== "transform") return;
+    rect.removeEventListener("transitionend", onDone);
+    whiteOverlay.classList.remove("expanding");
+    whiteOverlay.classList.add("expanded");
+    closeButton.innerHTML = arrowUpSVG();
+    closeButton.setAttribute("aria-label", "Collapse");
+    rectExpanded = true;
+    rectAnimating = false;
+    syncCloseButtonY();
+  };
+  rect.addEventListener("transitionend", onDone, { once: true });
+}
+
+function reverseRectExpansion() {
+  if (rectAnimating || !rectExpanded) return;
+  rectAnimating = true;
+  const rects = Array.from(rectGrid.querySelectorAll(".rect"));
+  const rect = selectedRect;
+  const others = rects.filter((r) => r !== rect);
+  others.forEach((r) => {
+    r.style.transition = "none";
+    r.style.transform = savedTransforms.get(r) || "";
+    r.style.opacity = "1";
+  });
+  void rectGrid.offsetHeight;
+  others.forEach((r) => {
+    r.style.transition = "";
+  });
+  const original = savedTransforms.get(rect) || "";
+  rect.style.transform = original;
+  rect.style.opacity = "";
+  const onBack = (e) => {
+    if (e.propertyName !== "transform") return;
+    rect.removeEventListener("transitionend", onBack);
+    whiteOverlay.classList.remove("expanded");
+    rect.classList.remove("selected");
+    savedTransforms.clear();
+    closeButton.innerHTML = "&times;";
+    closeButton.setAttribute("aria-label", "Close overlay");
+    rectExpanded = false;
+    rectAnimating = false;
+    syncCloseButtonY();
+  };
+  rect.addEventListener("transitionend", onBack, { once: true });
+}
+
+rectGrid.addEventListener("click", (e) => {
+  if (rectAnimating || rectExpanded) return;
+  const target = e.target.closest(".rect");
+  if (!target) return;
+  expandRect(target);
+});
+
+whiteOverlay.addEventListener("transitionend", (e) => {
+  if (e.propertyName !== "opacity") return;
+  const isActive = whiteOverlay.classList.contains("active");
+  if (!isActive) {
+    closeButton.classList.remove("revealed");
+    if (rectExpanded || rectAnimating) {
+      reverseRectExpansion();
+      closeButton.innerHTML = "&times;";
+      closeButton.setAttribute("aria-label", "Close overlay");
+      whiteOverlay.classList.remove("expanded", "expanding");
+      rectExpanded = false;
+      rectAnimating = false;
+    }
+  }
+});
+
+whiteOverlay.addEventListener("scroll", syncCloseButtonY, { passive: true });
+closeButton && closeButton.addEventListener("pointerdown", () => spinOnce(closeButton));
+closeButton && closeButton.addEventListener("click", closeOverlay);
+closeButton &&
+  closeButton.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      spinOnce(closeButton);
+      closeOverlay();
+    }
+  });
 
 </script>
 </body>
