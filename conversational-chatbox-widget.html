@@ -1,0 +1,4224 @@
+<!-- Poppins font -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap"
+  rel="stylesheet"
+/>
+
+<style>
+  #ai-chat-widget,
+  #ai-chat-widget * {
+    font-family: "Poppins", system-ui, -apple-system, BlinkMacSystemFont,
+      sans-serif;
+    box-sizing: border-box;
+  }
+
+  #ai-chat-widget {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    width: 360px;
+    max-width: 90%;
+    z-index: 9999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 1s ease-in-out;
+  }
+
+  #ai-chat-widget.fade-in-widget {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* Expanded state for vision reveal - grows left from original position */
+  #ai-chat-widget.expanded-vision {
+    width: 580px;
+    max-width: 95%;
+    transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  #ai-chat-widget.expanded-vision #ai-chat-messages {
+    height: 400px;
+    transition: height 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  #ai-chat-widget.expanded-vision .ai-message {
+    max-width: 95%;
+  }
+
+  /* Shrinking transition */
+  #ai-chat-widget.shrinking-back {
+    transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  #ai-chat-widget.shrinking-back #ai-chat-messages {
+    transition: height 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Expanded state for game */
+  #ai-chat-widget.expanded-game {
+    width: 480px;
+    max-width: 95%;
+    transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  #ai-chat-widget.expanded-game #ai-chat-messages {
+    height: 400px;
+    transition: height 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  #ai-chat-widget.expanded-game .game-inner {
+    height: 300px;
+  }
+
+  /* Vision text styling */
+  .vision-text {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.92);
+    line-height: 1.65;
+  }
+
+  .vision-text em {
+    font-style: italic;
+    color: #fff;
+  }
+
+  /* The roadmap container */
+  .vision-roadmap {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin: 4px 0;
+  }
+
+  .vision-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 12px 0;
+    opacity: 0;
+    transform: translateX(-12px);
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+
+  .vision-step:last-child {
+    border-bottom: none;
+  }
+
+  .vision-step.step-visible {
+    opacity: 1;
+    transform: translateX(0);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+
+  .step-num {
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.6);
+    margin-top: 2px;
+  }
+
+  .step-text {
+    font-size: 12.5px;
+    line-height: 1.6;
+    color: rgba(255,255,255,0.85);
+  }
+
+  .step-text strong {
+    color: #fff;
+    font-weight: 600;
+  }
+
+  /* Northeastern section */
+  .neu-section {
+    margin: 6px 0;
+    padding: 14px 16px;
+    background: rgba(200, 16, 46, 0.06);
+    border-left: 2px solid rgba(200, 16, 46, 0.4);
+    border-radius: 0 10px 10px 0;
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  .neu-section.section-visible {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+
+  .neu-section p {
+    margin: 0;
+    font-size: 12.5px;
+    line-height: 1.6;
+    color: rgba(255,255,255,0.88);
+  }
+
+  /* Go back button */
+  .vision-back-btn {
+    display: inline-block;
+    margin-top: 6px;
+    padding: 10px 24px;
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 24px;
+    color: rgba(255,255,255,0.9);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  .vision-back-btn.btn-visible {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.5s ease, transform 0.5s ease, background 0.3s ease, border-color 0.3s ease;
+  }
+
+  .vision-back-btn:hover {
+    background: rgba(255,255,255,0.1);
+    border-color: rgba(255,255,255,0.4);
+  }
+
+  /* Floating pill header (lighter + more transparent) */
+  #ai-chat-header {
+    background: rgba(70, 70, 70, 0.4);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    color: #f5f5f5;
+    padding: 10px 16px;
+    border-radius: 999px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+    font-size: 13px;
+    font-weight: 500;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+  }
+
+  #ai-chat-header-icon {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: #f5f5f5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #111;
+    font-size: 16px;
+  }
+
+  #ai-chat-header-text {
+    flex: 1;
+  }
+
+  /* Main chat body (slightly darker + slightly more transparent) */
+  #ai-chat-body {
+    margin-top: 10px;
+    background: rgba(60, 60, 60, 0.35);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 24px;
+    padding: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.28);
+  }
+
+  #ai-chat-body.hidden {
+    display: none;
+  }
+
+  #ai-chat-messages {
+    height: 260px;
+    overflow-y: auto;
+    font-size: 13px;
+    margin-bottom: 10px;
+    padding-right: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  /* Hide scrollbar while game is active */
+  #ai-chat-messages.hide-scrollbar {
+    scrollbar-width: none;
+  }
+  #ai-chat-messages.hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  #ai-chat-messages::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  #ai-chat-messages::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 999px;
+  }
+
+  .ai-message,
+  .user-message {
+    max-width: 90%;
+    padding: 8px 12px;
+    border-radius: 18px;
+    line-height: 1.4;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  /* Only affects the message that contains the game */
+  .ai-message.game-wrapper,
+  .user-message.game-wrapper {
+    max-width: 100%;
+    padding: 0;
+    background: transparent;
+    border-radius: 0;
+    align-self: stretch;
+  }
+
+  .ai-message {
+    align-self: flex-start;
+    background: rgba(255, 255, 255, 0.15);
+    color: #ffffff;
+    border-bottom-left-radius: 4px;
+  }
+
+  .user-message {
+    align-self: flex-end;
+    background: rgba(255, 255, 255, 0.25);
+    color: #ffffff;
+    border-bottom-right-radius: 4px;
+  }
+
+  .ai-label,
+  .user-label {
+    display: block;
+    font-size: 10px;
+    opacity: 0.8;
+    margin-bottom: 2px;
+    color: #ffffff;
+  }
+
+  /* Typing indicator bubble */
+  .typing-indicator {
+    opacity: 0.7;
+    font-style: italic;
+    color: #ffffff;
+  }
+
+  /* Take Me button */
+  .take-me-btn {
+    margin-top: 6px;
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 500;
+    cursor: pointer;
+    opacity: 0;
+    transform: translateY(4px);
+    animation: fadeInUp 0.35s ease forwards;
+  }
+
+  .take-me-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+  }
+
+  /* Suggestion buttons */
+  .suggest-btn {
+    margin-top: 6px;
+    margin-right: 6px;
+    display: inline-block;
+    padding: 6px 10px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    background: transparent;
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 500;
+    cursor: pointer;
+    opacity: 0;
+    transform: translateY(4px);
+    animation: fadeInUp 0.35s ease forwards;
+    white-space: nowrap;
+  }
+
+  .suggest-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+  }
+
+  @keyframes fadeInUp {
+    0% {
+      opacity: 0;
+      transform: translateY(4px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Fade-out for bye */
+  .fade-out-fast {
+    animation: fadeOutFast 0.6s ease forwards;
+  }
+
+  .fade-out-slow {
+    animation: fadeOutSlow 1.2s ease forwards;
+  }
+
+  @keyframes fadeOutFast {
+    to {
+      opacity: 0;
+      transform: translateY(4px);
+    }
+  }
+
+  @keyframes fadeOutSlow {
+    to {
+      opacity: 0;
+      transform: translateY(4px);
+    }
+  }
+
+  #ai-chat-input-row {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 999px;
+    padding: 6px 8px 6px 10px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  #ai-chat-input {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: #ffffff;
+    font-size: 13px;
+  }
+
+  #ai-chat-input::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  /* Placeholder fade animation (no layout change) */
+  #ai-chat-input.placeholder-fade {
+    animation: placeholderFade 0.6s ease-in-out;
+  }
+
+  @keyframes placeholderFade {
+    0% {
+      opacity: 1;
+    }
+    45% {
+      opacity: 0;
+    }
+    55% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+
+  #ai-chat-send {
+    border: none;
+    outline: none;
+    border-radius: 999px;
+    padding: 6px 10px;
+    font-size: 12px;
+    font-weight: 500;
+    background: rgba(255, 255, 255, 0.25);
+    color: #ffffff;
+    cursor: pointer;
+    transition: transform 0.12s ease, box-shadow 0.12s ease,
+      background 0.12s ease;
+  }
+
+  #ai-chat-send:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    background: rgba(255, 255, 255, 0.35);
+  }
+
+  #ai-chat-send:active {
+    transform: translateY(0);
+    box-shadow: none;
+  }
+
+  /* === GAME STYLES === */
+  .game-container {
+    margin-top: 10px;
+    width: 100%;
+    border-radius: 16px;
+    overflow: hidden;
+    /* Match the light grey/white-outline feel of the chat input / Take Me button */
+    background: transparent; /* removed dark-ish block under the game */
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: none; /* no heavy drop shadow panel */
+    position: relative;
+    animation: fadeInUp 0.7s ease forwards;
+  }
+
+  .game-inner {
+    position: relative;
+    width: 100%;
+    height: 220px;
+  }
+
+  #pongCanvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    /* Let the lighter container show through / keep it soft */
+    background: rgba(255, 255, 255, 0.08);
+  }
+
+  .game-overlay-text {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    font-size: 26px;
+    color: #ffffff; /* countdown + GAME OVER in white */
+    text-transform: uppercase;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .game-overlay-text.fade-out {
+    animation: gameTextFadeOut 0.8s ease forwards;
+  }
+
+  @keyframes gameTextFadeOut {
+    to {
+      opacity: 0;
+      transform: translateY(-4px);
+    }
+  }
+
+  /* Click-to-play overlay */
+  .game-click-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(40, 40, 40, 0.35); /* lighter + more transparent */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+  }
+
+  .game-click-overlay.fade-out {
+    animation: clickOverlayFadeOut 0.5s ease forwards;
+  }
+
+  @keyframes clickOverlayFadeOut {
+    to {
+      opacity: 0;
+      transform: scale(1.02);
+    }
+  }
+
+  .game-click-button {
+    padding: 7px 14px; /* keep click-to-play width closer to Try again but same height pattern */
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 500;
+    cursor: pointer;
+    box-shadow: none;
+    transition: transform 0.12s ease, box-shadow 0.12s ease,
+      background 0.12s ease;
+  }
+
+  .game-click-button:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-1px);
+    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.6);
+  }
+
+  .game-click-button:active {
+    transform: translateY(0);
+    box-shadow: 0 5px 14px rgba(0, 0, 0, 0.45);
+  }
+
+  .game-score {
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: #ffffff; /* score text in white */
+    pointer-events: none;
+  }
+
+  .game-score span {
+    font-weight: 600;
+    margin-left: 4px;
+  }
+
+  .game-fade-out {
+    animation: gameContainerFadeOut 0.9s ease forwards;
+  }
+
+  @keyframes gameContainerFadeOut {
+    to {
+      opacity: 0;
+      transform: translateY(4px);
+    }
+  }
+
+  .try-again-btn {
+    margin-top: 8px;
+    padding: 7px 14px;
+    border-radius: 999px;
+    /* match the Take Me button style, no dark block */
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 500;
+    cursor: pointer;
+    box-shadow: none;
+    animation: fadeInUp 0.35s ease forwards;
+  }
+
+  .try-again-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+  }
+</style>
+
+<!-- === WHITE OVERLAY X / ARROW & RECTANGLE LOGIC FROM YOUR INDEX CODE === -->
+<script>
+  const indexButton = document.getElementById("indexButton");
+  const whiteOverlay = document.getElementById("whiteOverlay");
+  const closeButton = document.getElementById("closeButton");
+  const overlayTitle = document.getElementById("overlayTitle");
+  const rectGrid = document.getElementById("rectGrid");
+
+  const OVERLAY_FADE_MS = 1600;
+  const X_APPEAR_DELAY_MS = 600;
+
+  let xRevealTimer = null;
+
+  function clearXTimer() {
+    if (xRevealTimer) {
+      clearTimeout(xRevealTimer);
+      xRevealTimer = null;
+    }
+  }
+
+  function spinOnce(el) {
+    if (!el) return;
+    el.classList.add("spin");
+    setTimeout(() => el.classList.remove("spin"), 360);
+  }
+
+  function arrowUpSVG() {
+    return `
+      <svg aria-hidden="true" width="1em" height="1em" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+        <g fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 28 V16"/>
+          <path d="M8 24 L20 12 L32 24"/>
+        </g>
+      </svg>
+    `;
+  }
+
+  function syncCloseButtonY() {
+    if (!whiteOverlay || !closeButton) return;
+    const y = whiteOverlay.scrollTop || 0;
+    closeButton.style.setProperty("--scrollY", y + "px");
+  }
+
+  let rectExpanded = false;
+  let rectAnimating = false;
+  let selectedRect = null;
+  let savedTransforms = new Map();
+
+  function resetOverlayGrid() {
+    if (!whiteOverlay || !overlayTitle || !closeButton || !rectGrid) return;
+
+    whiteOverlay.classList.remove("closing", "expanded", "expanding");
+    overlayTitle.classList.remove("fade-out", "quick");
+    closeButton.innerHTML = "&times;";
+    closeButton.setAttribute("aria-label", "Close overlay");
+
+    const rects = Array.from(rectGrid.querySelectorAll(".rect"));
+    rects.forEach((r) => {
+      r.classList.remove("selected");
+      r.style.transform = "";
+      r.style.opacity = "";
+    });
+
+    rectExpanded = false;
+    rectAnimating = false;
+    selectedRect = null;
+    savedTransforms.clear();
+
+    closeButton.style.setProperty("--scrollY", "0px");
+  }
+
+  indexButton &&
+    indexButton.addEventListener("click", () => {
+      if (!whiteOverlay || !closeButton) return;
+      clearXTimer();
+      resetOverlayGrid();
+      whiteOverlay.classList.add("active");
+      syncCloseButtonY();
+      xRevealTimer = setTimeout(() => {
+        closeButton.classList.add("revealed");
+        spinOnce(closeButton);
+      }, X_APPEAR_DELAY_MS);
+    });
+
+  function getRectCenterTopTarget() {
+    const gridBox = rectGrid.getBoundingClientRect();
+    const cs = getComputedStyle(rectGrid);
+    const padTop = parseFloat(cs.paddingTop) || 0;
+    return {
+      x: gridBox.left + gridBox.width / 2,
+      y: gridBox.top + padTop,
+    };
+  }
+
+  function expandRect(rect) {
+    if (!whiteOverlay || !closeButton || !rectGrid) return;
+    if (rectAnimating || rectExpanded) return;
+    rectAnimating = true;
+    selectedRect = rect;
+
+    const rects = Array.from(rectGrid.querySelectorAll(".rect"));
+    rects.forEach((r) => savedTransforms.set(r, r.style.transform || ""));
+
+    whiteOverlay.classList.add("expanding");
+    rect.classList.add("selected");
+
+    const from = rect.getBoundingClientRect();
+    const gridBox = rectGrid.getBoundingClientRect();
+    const targetTopCenter = getRectCenterTopTarget();
+
+    const dx = targetTopCenter.x - (from.left + from.width / 2);
+    const dy = targetTopCenter.y - from.top;
+
+    const scaleX = gridBox.width / from.width;
+    const scaleY = gridBox.height / from.height;
+
+    rect.style.transform = `translate3d(${dx}px, ${dy}px, 0) scale(${scaleX}, ${scaleY})`;
+
+    const onDone = (e) => {
+      if (e.propertyName !== "transform") return;
+      rect.removeEventListener("transitionend", onDone);
+      whiteOverlay.classList.remove("expanding");
+      whiteOverlay.classList.add("expanded");
+      closeButton.innerHTML = arrowUpSVG();
+      closeButton.setAttribute("aria-label", "Collapse");
+      rectExpanded = true;
+      rectAnimating = false;
+      syncCloseButtonY();
+    };
+    rect.addEventListener("transitionend", onDone, { once: true });
+  }
+
+  function reverseRectExpansion() {
+    if (!whiteOverlay || !closeButton || !rectGrid) return;
+    if (rectAnimating || !rectExpanded) return;
+    rectAnimating = true;
+
+    const rects = Array.from(rectGrid.querySelectorAll(".rect"));
+    const rect = selectedRect;
+
+    const others = rects.filter((r) => r !== rect);
+    others.forEach((r) => {
+      r.style.transition = "none";
+      r.style.transform = savedTransforms.get(r) || "";
+      r.style.opacity = "1";
+    });
+    void rectGrid.offsetHeight;
+    others.forEach((r) => {
+      r.style.transition = "";
+    });
+
+    const original = savedTransforms.get(rect) || "";
+    rect.style.transform = original;
+    rect.style.opacity = "";
+
+    const onBack = (e) => {
+      if (e.propertyName !== "transform") return;
+      rect.removeEventListener("transitionend", onBack);
+      whiteOverlay.classList.remove("expanded");
+      rect.classList.remove("selected");
+      savedTransforms.clear();
+      closeButton.innerHTML = "&times;";
+      closeButton.setAttribute("aria-label", "Close overlay");
+      rectExpanded = false;
+      rectAnimating = false;
+      syncCloseButtonY();
+    };
+    rect.addEventListener("transitionend", onBack, { once: true });
+  }
+
+  rectGrid &&
+    rectGrid.addEventListener("click", (e) => {
+      if (rectAnimating || rectExpanded) return;
+      const target = e.target.closest(".rect");
+      if (!target) return;
+      expandRect(target);
+    });
+
+  const closeOverlay = () => {
+    if (!whiteOverlay || !overlayTitle || !closeButton) return;
+    clearXTimer();
+    spinOnce(closeButton);
+
+    if (rectExpanded) {
+      reverseRectExpansion();
+      return;
+    }
+
+    overlayTitle.classList.add("quick");
+    overlayTitle.classList.add("fade-out");
+    whiteOverlay.classList.add("closing");
+    whiteOverlay.classList.remove("active");
+    closeButton.classList.remove("revealed");
+
+    setTimeout(() => {
+      closeButton.style.setProperty("--scrollY", "0px");
+    }, OVERLAY_FADE_MS);
+  };
+
+  whiteOverlay &&
+    whiteOverlay.addEventListener("transitionend", (e) => {
+      if (e.propertyName !== "opacity") return;
+      const isActive = whiteOverlay.classList.contains("active");
+      if (!isActive) {
+        closeButton && closeButton.classList.remove("revealed");
+        if (rectExpanded || rectAnimating) {
+          reverseRectExpansion();
+          closeButton.innerHTML = "&times;";
+          closeButton.setAttribute("aria-label", "Close overlay");
+          whiteOverlay.classList.remove("expanded", "expanding");
+          rectExpanded = false;
+          rectAnimating = false;
+        }
+      }
+    });
+
+  whiteOverlay &&
+    whiteOverlay.addEventListener("scroll", syncCloseButtonY, {
+      passive: true,
+    });
+
+  closeButton &&
+    closeButton.addEventListener("pointerdown", () => spinOnce(closeButton));
+  closeButton && closeButton.addEventListener("click", closeOverlay);
+
+  closeButton &&
+    closeButton.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        spinOnce(closeButton);
+        closeOverlay();
+      }
+    });
+</script>
+
+<!-- === CHAT WIDGET === -->
+<div id="ai-chat-widget">
+  <div id="ai-chat-header">
+    <div id="ai-chat-header-icon">💬</div>
+    <div id="ai-chat-header-text">Chat with Kate</div>
+  </div>
+  <div id="ai-chat-body" class="hidden">
+    <div id="ai-chat-messages"></div>
+    <div id="ai-chat-input-row">
+      <input
+        id="ai-chat-input"
+        type="text"
+        placeholder='Try: "show me tech projects"'
+      />
+      <button id="ai-chat-send" type="button">Send</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // === GLOBAL FUNCTION: Open chat with intro messages (called from main page after strudel) ===
+  function openChatWithMessage() {
+    const chatWidget = document.getElementById('ai-chat-widget');
+    const body = document.getElementById('ai-chat-body');
+    
+    if (!chatWidget || !body) return;
+    
+    if (!chatWidget.classList.contains('fade-in-widget')) {
+      chatWidget.classList.add('fade-in-widget');
+    }
+    
+    body.style.display = "block";
+    body.classList.remove("hidden");
+    
+    setTimeout(() => {
+      if (window._chatWidgetShowMessage) {
+        window._chatWidgetShowMessage();
+      }
+    }, 300);
+  }
+
+  (function () {
+    // Widget stays hidden until openChatWithMessage() is called from main page after wheel returns
+
+    const header = document.getElementById("ai-chat-header");
+    const body = document.getElementById("ai-chat-body");
+    const messagesEl = document.getElementById("ai-chat-messages");
+    const inputEl = document.getElementById("ai-chat-input");
+    const sendBtn = document.getElementById("ai-chat-send");
+
+    const ABOUT_URL = "https://www.katelaviolette.com/about-3";
+    const whiteOverlay = document.getElementById("whiteOverlay");
+
+    const MOOD_QUESTION =
+      "What are you in the mood for, design, tech, or copy?";
+
+    let hasShownIntro = false;
+    let expectingMoodReply = false; // user mood/day
+    let expectingFollowupToSelfMood = false; // they asked "how are you?"
+    let expectingGreetingReaction = false; // reacting to greeting answer
+    let lastReplyWasSingleWordMood = false;
+    let lastReplyHadSuggestions = false;
+    let closingInProgress = false;
+
+    let undecidedQuestionActive = false;
+    let undecidedContext = null; // "creative" | "visual" | "copy"
+    let lastSuggestionsWereExtraOptions = false;
+
+    let activeGame = null;
+
+    // repeated phrase tracking
+    let lastUserNormalized = null;
+    let repeatCount = 0;
+
+    // NEW: track last assistant visible text so it never repeats exactly
+    let lastAssistantText = "";
+
+    const GREETING_REPLIES = [
+      "Hey hey ✨",
+      "Hi, glad you popped in.",
+      "Hey! How's your day going?",
+      "Hey there. What are you in the mood to look at?",
+    ];
+
+    const SELF_MOOD_REPLIES = [
+      "Honestly, pretty good.",
+      "Doing great over here.",
+      "I'm vibing. 🌀",
+      "I'm good and excited to show you stuff.",
+    ];
+
+    const EXTRA_OPTION_BUTTONS = [
+      "Show me brand-building work.",
+      "Show me campaign work.",
+      "Show me UX work.",
+      "Show me website projects.",
+      "Show me content strategy work.",
+      "Show me social content.",
+      "Show me long-form writing.",
+      "Show me fundraising work.",
+    ];
+
+    /* JOKES: four only, paragraph-style lines */
+    const JOKES = [
+      "Did you know studies show you shouldn't brush your teeth with your left hand?\n\nDo you know why?\n\nThey say it's a lot better to brush your teeth with a toothbrush.",
+      "What has 5 toes and isn't your foot?\n\nMy foot.",
+      "RIP boiling water.\n\nYou will be mist.",
+      "What did 0 say to 8?\n\nNice belt!",
+    ];
+
+    /* === DYNAMIC PLACEHOLDER OPTIONS (ALL PROJECT TYPES) === */
+    const placeholderOptions = [
+      "tech projects",
+      "design work",
+      "copywriting projects",
+      "UX work",
+      "website projects",
+      "content strategy work",
+      "social content",
+      "long-form writing",
+      "fundraising work",
+      "brand-building work",
+      "campaign work",
+    ];
+    let placeholderIndex = 0;
+    const PLACEHOLDER_PREFIX = 'Try: "show me ';
+    const PLACEHOLDER_SUFFIX = '"';
+
+    function setPlaceholderFromIndex() {
+      if (!inputEl) return;
+      const option = placeholderOptions[placeholderIndex];
+      inputEl.placeholder =
+        PLACEHOLDER_PREFIX + option + PLACEHOLDER_SUFFIX;
+    }
+
+    function cyclePlaceholder() {
+      if (!inputEl) return;
+
+      const userIsTyping = inputEl.value.trim() !== "";
+      if (userIsTyping) {
+        // Keep cycling the suggestion list in the background without animating
+        placeholderIndex =
+          (placeholderIndex + 1) % placeholderOptions.length;
+        return;
+      }
+
+      inputEl.classList.add("placeholder-fade");
+      setTimeout(() => {
+        placeholderIndex =
+          (placeholderIndex + 1) % placeholderOptions.length;
+        setPlaceholderFromIndex();
+      }, 300);
+      setTimeout(() => {
+        inputEl.classList.remove("placeholder-fade");
+      }, 600);
+    }
+
+    if (inputEl) {
+      setPlaceholderFromIndex();
+      // Rotate placeholder every 3 seconds, always
+      setInterval(cyclePlaceholder, 3000);
+    }
+
+    /* === TYPEWRITER FOR AI RESPONSES (always scroll to bottom) === */
+    function typeText(element, fullText, speed, onComplete) {
+      let index = 0;
+      function step() {
+        if (!element) return;
+        if (index <= fullText.length) {
+          element.innerHTML = fullText.slice(0, index);
+          index++;
+          // always keep scrolled to bottom while typing
+          if (messagesEl) {
+            messagesEl.scrollTop = messagesEl.scrollHeight;
+          }
+          setTimeout(step, speed);
+        } else if (typeof onComplete === "function") {
+          onComplete();
+        }
+      }
+      step();
+    }
+
+    function pick(arr) {
+      return arr[Math.floor(Math.random() * Math.random() * arr.length)];
+    }
+
+    function squashStretchyLetters(str) {
+      return str.replace(/([aeiouy])\1+/g, "$1");
+    }
+
+    // NEW: make sure text is not exactly the same as last visible assistant text
+    function ensureNotSameAsLastDisplay(text) {
+      if (!text) return text;
+      if (text === lastAssistantText) {
+        // Slightly vary the phrasing so it isn't literally the same
+        if (text.endsWith("?")) {
+          return "Also, " + text;
+        }
+        if (text.endsWith("!")) {
+          return text + " 🙂";
+        }
+        return text + " 🙂";
+      }
+      return text;
+    }
+
+    /* === SUGGESTIONS: project-type options only === */
+    function buildSuggestions() {
+      const shuffled = [...EXTRA_OPTION_BUTTONS];
+      shuffled.sort(() => Math.random() - 0.5);
+      return shuffled.slice(0, 3);
+    }
+
+    function appendMessage(role, text, extraClass) {
+      const isAI = role === "assistant" || role === "ai";
+      const wrapper = document.createElement("div");
+      wrapper.className =
+        (isAI ? "ai-message" : "user-message") +
+        (extraClass ? " " + extraClass : "");
+
+      const label = document.createElement("span");
+      label.className = isAI ? "ai-label" : "user-label";
+      label.textContent = isAI ? "Kate" : "You";
+
+      const content = document.createElement("span");
+      // Allow HTML for assistant messages so we can use paragraphs/italics
+      if (isAI) {
+        content.innerHTML = text;
+      } else {
+        content.textContent = text;
+      }
+
+      wrapper.appendChild(label);
+      wrapper.appendChild(content);
+      messagesEl.appendChild(wrapper);
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+
+      return { wrapper, content };
+    }
+
+    function showTypingIndicator() {
+      const { wrapper, content } = appendMessage(
+        "assistant",
+        ".",
+        "typing-indicator"
+      );
+      let dots = 1;
+      const intervalId = setInterval(() => {
+        dots = (dots % 3) + 1;
+        content.textContent = ".".repeat(dots);
+        if (messagesEl) {
+          messagesEl.scrollTop = messagesEl.scrollHeight;
+        }
+      }, 700); // slower think bubble
+      wrapper._typingIntervalId = intervalId;
+      return wrapper;
+    }
+
+    function removeTypingIndicator(el) {
+      if (el) {
+        if (el._typingIntervalId) {
+          clearInterval(el._typingIntervalId);
+        }
+        if (el.parentNode) {
+          el.parentNode.removeChild(el);
+        }
+      }
+    }
+
+    // === EXPOSE FUNCTION TO SHOW MESSAGE EXTERNALLY (for post-strudel trigger) ===
+    let demoMode = false; // When true, buttons don't work (except game)
+    let justSawIntro = false; // Track if user just saw the intro for special responses
+    let awaitingVisionResponse = false; // Track if we asked about the vision
+    
+    window._chatWidgetShowMessage = function() {
+      hasShownIntro = true;
+      demoMode = true; // Enable demo mode - buttons won't work
+      
+      const firstMessage = "<strong>I'm still building out the personalized features, so I can't show you any projects yet.</strong>";
+      const secondMessage = "But, you can chat with me and see how I function so far :)";
+      const thirdMessage = "Would you like to know what I'm working on next?";
+      
+      const typingEl = showTypingIndicator();
+      
+      setTimeout(() => {
+        removeTypingIndicator(typingEl);
+        const msg1 = appendMessage("assistant", "");
+        typeText(msg1.content, firstMessage, 30, () => {
+          lastAssistantText = firstMessage;
+          
+          // Show second message after first finishes
+          const typingEl2 = showTypingIndicator();
+          setTimeout(() => {
+            removeTypingIndicator(typingEl2);
+            const msg2 = appendMessage("assistant", "");
+            typeText(msg2.content, secondMessage, 30, () => {
+              lastAssistantText = secondMessage;
+              
+              // Show third message (the question) after second finishes
+              const typingEl3 = showTypingIndicator();
+              setTimeout(() => {
+                removeTypingIndicator(typingEl3);
+                const msg3 = appendMessage("assistant", "");
+                typeText(msg3.content, thirdMessage, 30, () => {
+                  lastAssistantText = thirdMessage;
+                  awaitingVisionResponse = true; // Now waiting for yes/no
+                });
+              }, 800);
+            });
+          }, 1000);
+        });
+      }, 1200);
+    };
+
+    function classifyMoodAfterHows(textLower) {
+      const squashed = squashStretchyLetters(textLower.toLowerCase());
+      const base = squashed
+        .replace(/[^a-z\s]/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+      const tokens = base.split(/\s+/).filter(Boolean);
+
+      const greetingFollowups = ["hi", "hey", "hello", "sup", "hiya"];
+      if (tokens.length <= 4 && tokens.length > 0) {
+        if (tokens.length === 1 && greetingFollowups.includes(tokens[0])) {
+          return "positive";
+        }
+        const joinedGreetings = tokens.join(" ");
+        for (const g of ["hi there", "hey there", "hey friend", "hey kate"]) {
+          if (joinedGreetings.startsWith(g)) {
+            return "positive";
+          }
+        }
+      }
+
+      const positiveOverrides = [
+        "not bad",
+        "cant complain",
+        "can't complain",
+        "no complaints",
+        "all good",
+        "pretty good",
+        "doing good",
+        "doing great",
+        "doing fine",
+        "doing well",
+        "feeling good",
+        "feeling great",
+        "feeling fine",
+        "going good",
+        "going great",
+      ];
+      for (const p of positiveOverrides) {
+        if (base.includes(p)) {
+          return "positive";
+        }
+      }
+
+      const negators = ["not", "no", "nah", "nope", "never", "nothing", "nowhere"];
+      if (tokens.some((t) => negators.includes(t))) {
+        return "negative";
+      }
+
+      const negativeWords = [
+        "bad",
+        "terrible",
+        "awful",
+        "horrible",
+        "horrid",
+        "sad",
+        "tired",
+        "stressed",
+        "anxious",
+        "anxiety",
+        "depressed",
+        "depressing",
+        "down",
+        "low",
+        "blue",
+        "drained",
+        "exhausted",
+        "overwhelmed",
+        "overwhelming",
+        "meh",
+        "mid",
+        "rough",
+        "miserable",
+        "worse",
+        "worst",
+        "angry",
+        "upset",
+        "mad",
+        "unwell",
+        "sick",
+        "burnt",
+        "broken",
+        "draining",
+        "trash",
+        "crap",
+        "sucks",
+        "sucky",
+      ];
+      for (const t of tokens) {
+        if (negativeWords.includes(t)) {
+          return "negative";
+        }
+      }
+
+      if (tokens.length <= 4) {
+        const shortNegatives = [
+          "no",
+          "nope",
+          "nah",
+          "not really",
+          "not much",
+          "could be better",
+          "could be worse, honestly",
+        ];
+        const joined = tokens.join(" ");
+        for (const sn of shortNegatives) {
+          if (joined === sn || joined.startsWith(sn + " ")) {
+            return "negative";
+          }
+        }
+      }
+
+      const positiveMoodWords = [
+        "good",
+        "great",
+        "fine",
+        "ok",
+        "okay",
+        "alright",
+        "all right",
+        "well",
+        "awesome",
+        "amazing",
+        "fantastic",
+        "nice",
+        "cool",
+        "chill",
+        "chillin",
+        "chilling",
+        "decent",
+        "pretty good",
+        "super good",
+        "so good",
+        "very good",
+        "solid",
+        "vibing",
+        "vibeing",
+      ];
+      for (const w of positiveMoodWords) {
+        if (base.includes(w)) {
+          return "positive";
+        }
+      }
+
+      return "positive";
+    }
+
+    function generateReply(userText) {
+      const lower = userText.toLowerCase().trim();
+      const squashedLower = squashStretchyLetters(lower);
+      const hasQuestionMark = lower.includes("?");
+
+      const aboutLink = ABOUT_URL;
+
+      const baseNoPunct = lower.replace(/[.!?]+$/g, "").trim();
+      const baseNoPunctLower = baseNoPunct.toLowerCase();
+      const squashNoPunct = squashedLower.replace(/[.!?]+$/g, "").trim();
+      const lettersOnly = lower
+        .replace(/[^a-z\s']/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+      const squashedLettersOnly = squashStretchyLetters(lettersOnly);
+      const words = squashedLettersOnly.split(/\s+/).filter(Boolean);
+
+      // === POST-INTRO ACKNOWLEDGMENT HANDLING ===
+      // If user just saw the intro, handle their first response specially
+      if (justSawIntro) {
+        justSawIntro = false; // Reset flag
+        
+        const postIntroAcks = [
+          "ok", "okay", "cool", "got it", "gotcha", "understood", 
+          "i see", "makes sense", "alright", "sure", "right",
+          "nice", "interesting", "oh", "ah", "hm", "hmm",
+          "that's cool", "thats cool", "sounds good", "no worries",
+          "no problem", "all good", "fair enough", "i understand"
+        ];
+        
+        let isPostIntroAck = postIntroAcks.includes(baseNoPunctLower);
+        if (!isPostIntroAck) {
+          for (const ack of postIntroAcks) {
+            if (lower.includes(ack)) {
+              isPostIntroAck = true;
+              break;
+            }
+          }
+        }
+        
+        if (isPostIntroAck) {
+          return {
+            text: "So, want to chat, hear a joke, or type 'game' for a quick break?",
+            showButton: false,
+          };
+        }
+      }
+
+      // === VISION RESPONSE HANDLING ===
+      // If we asked about the vision, handle yes/no
+      if (awaitingVisionResponse) {
+        awaitingVisionResponse = false;
+        
+        const yesPatterns = [
+          "yes", "yeah", "yep", "yup", "sure", "ok", "okay", "definitely",
+          "absolutely", "of course", "please", "tell me", "show me",
+          "i'd love to", "id love to", "i would", "yes please", "go ahead",
+          "let's hear it", "lets hear it", "i'm curious", "im curious",
+          "what is it", "what's next", "whats next"
+        ];
+        
+        const noPatterns = [
+          "no", "nope", "nah", "not really", "no thanks", "no thank you",
+          "i'm good", "im good", "maybe later", "skip", "pass"
+        ];
+        
+        let isYes = yesPatterns.includes(baseNoPunctLower);
+        let isNo = noPatterns.includes(baseNoPunctLower);
+        
+        if (!isYes && !isNo) {
+          for (const y of yesPatterns) {
+            if (lower.includes(y)) { isYes = true; break; }
+          }
+        }
+        if (!isYes && !isNo) {
+          for (const n of noPatterns) {
+            if (lower.includes(n)) { isNo = true; break; }
+          }
+        }
+        
+        if (isYes) {
+          return {
+            text: "__VISION_REVEAL__",
+            showButton: false,
+            expandChat: true,
+          };
+        }
+        
+        if (isNo) {
+          justSawIntro = true;
+          return {
+            text: "No problem. You can always ask me about it later if you get curious. So, want to chat, hear a joke, or type 'game'?",
+            showButton: false,
+          };
+        }
+        
+        // If unclear, assume interest
+        return {
+          text: "__VISION_REVEAL__",
+          showButton: false,
+          expandChat: true,
+        };
+      }
+
+      // === VISION TRIGGER PATTERNS ===
+      // Allow user to see the vision reveal anytime by asking about it
+      const visionTriggerPatterns = [
+        "what are you working on",
+        "what's next",
+        "whats next",
+        "future plans",
+        "future features",
+        "what's coming",
+        "whats coming",
+        "northeastern",
+        "grad program",
+        "graduate program",
+        "master's",
+        "masters",
+        "masters program",
+        "why northeastern",
+        "your plans",
+        "the plan",
+        "your vision",
+        "the vision",
+        "what you're building",
+        "what youre building",
+        "show me the plan",
+        "tell me the plan",
+        "what's the plan",
+        "whats the plan",
+        "ai program",
+        "machine learning",
+        "where is this going",
+        "where's this going",
+        "what comes next",
+        "the vibe data",
+        "vibe calculator",
+        "the vibe check",
+        "how does the vibe",
+        "what does the vibe",
+        "working on next",
+        "building next"
+      ];
+      
+      let triggersVision = false;
+      for (const pattern of visionTriggerPatterns) {
+        if (lower.includes(pattern)) {
+          triggersVision = true;
+          break;
+        }
+      }
+      
+      if (triggersVision) {
+        return {
+          text: "__VISION_REVEAL__",
+          showButton: false,
+          expandChat: true,
+        };
+      }
+
+      // Work keywords → always offer "Take Me" to work grid when they show up
+      const WORK_TRIGGER_TERMS = [
+        "brand building",
+        "brand work",
+        "brand strategy",
+        "brand project",
+        "brand projects",
+        "brand",
+        "campaign",
+        "campaigns",
+        "writing",
+        "copy",
+        "copywriting",
+        "content",
+        "content strategy",
+        "ux",
+        "user experience",
+        "product design",
+        "website",
+        "websites",
+        "site redesign",
+        "communication",
+        "communications",
+        "comms",
+        "fundraising",
+        "fundraising materials",
+        "donor deck",
+        "pitch deck",
+        "social",
+        "social content",
+        "social posts",
+        "long-form",
+        "longform",
+        "long form",
+      ];
+      const wantsWorkOverlay = WORK_TRIGGER_TERMS.some((term) =>
+        squashedLower.includes(term)
+      );
+
+      function withWorkButton(replyObj) {
+        if (wantsWorkOverlay || replyObj.forceOverlay) {
+          replyObj.showButton = true;
+          replyObj.forceOverlay = true;
+        }
+        return replyObj;
+      }
+
+      const greetingSingleWords = [
+        "hi",
+        "hey",
+        "hello",
+        "sup",
+        "hiya",
+        "howdy",
+        "morning",
+      ];
+      const greetingPhrases = [
+        "hey there",
+        "hi there",
+        "yo yo",
+        "hey yo",
+        "what's up",
+        "whats up",
+        "what up",
+        "what's good",
+        "whats good",
+        "wsg",
+        "good morning",
+        "good afternoon",
+        "good evening",
+        "hey friend",
+        "hey kate",
+      ];
+
+      /* === GAME TRIGGER (always respected) === */
+      if (
+        squashedLower.includes("play a game") ||
+        squashedLower.includes("lets play a game") ||
+        squashedLower.includes("let's play a game") ||
+        squashedLower.includes("can we play a game") ||
+        squashedLower.includes("wanna play a game") ||
+        squashedLower.includes("want to play a game") ||
+        squashedLower.includes("play pong") ||
+        squashedLower.includes("mini game") ||
+        squashedLower.includes("tiny game") ||
+        squashedLower.includes("game break") ||
+        squashedLower === "game"
+      ) {
+        expectingMoodReply = false;
+        expectingFollowupToSelfMood = false;
+        expectingGreetingReaction = false;
+        lastReplyWasSingleWordMood = false;
+        lastReplyHadSuggestions = false;
+        undecidedQuestionActive = false;
+        undecidedContext = null;
+        lastSuggestionsWereExtraOptions = false;
+
+        return withWorkButton({
+          text: "Love that. Here's a tiny game break.",
+          showGame: true,
+        });
+      }
+
+      /* === REPEATED-PHRASE BEHAVIOR (3+ times) === */
+      if (repeatCount >= 3) {
+        expectingMoodReply = false;
+        expectingFollowupToSelfMood = false;
+        expectingGreetingReaction = false;
+        lastReplyWasSingleWordMood = false;
+        lastReplyHadSuggestions = false;
+        undecidedQuestionActive = false;
+        undecidedContext = null;
+        lastSuggestionsWereExtraOptions = false;
+
+        return withWorkButton({
+          text: MOOD_QUESTION,
+          showButton: false,
+        });
+      }
+
+      /* 0.0) Greeting reaction */
+      if (expectingGreetingReaction) {
+        expectingGreetingReaction = false;
+
+        const greetingAgreePatternsExact = [
+          "same",
+          "same!",
+          "same.",
+          "same haha",
+          "same lol",
+          "same here",
+          "me too",
+          "me too!",
+          "me as well",
+          "you too",
+          "you too!",
+          "nice",
+          "nice!",
+          "nicee",
+          "cool",
+          "cool!",
+          "good!",
+          "good",
+          "awesome",
+          "awesome!",
+          "love that",
+        ];
+
+        const greetingAgreeContains = [
+          "that's nice",
+          "thats nice",
+          "good to hear",
+          "glad to hear",
+          "haha same",
+          "lol same",
+          "omg same",
+          "same tbh",
+          "same fr",
+        ];
+
+        let reactsToGreeting = false;
+        if (greetingAgreePatternsExact.includes(baseNoPunctLower)) {
+          reactsToGreeting = true;
+        } else {
+          for (const p of greetingAgreeContains) {
+            if (lower.includes(p)) {
+              reactsToGreeting = true;
+              break;
+            }
+          }
+        }
+
+        if (reactsToGreeting) {
+          lastSuggestionsWereExtraOptions = false;
+          return withWorkButton({
+            text: MOOD_QUESTION,
+            showButton: false,
+          });
+        }
+      }
+
+      /* 0) "nvm" / "never mind" */
+      if (
+        squashedLower.includes("nvm") ||
+        squashedLower.includes("never mind") ||
+        squashedLower.includes("nevermind")
+      ) {
+        expectingMoodReply = false;
+        expectingFollowupToSelfMood = false;
+        expectingGreetingReaction = false;
+        lastReplyWasSingleWordMood = false;
+        lastReplyHadSuggestions = false;
+        undecidedQuestionActive = false;
+        undecidedContext = null;
+        lastSuggestionsWereExtraOptions = false;
+        return withWorkButton({
+          text: "Got it, never mind.",
+          showButton: false,
+        });
+      }
+
+      /* 0.1) Compliments */
+      const complimentPatterns = [
+        "i like you",
+        "like you",
+        "i love you",
+        "love you",
+        "you are cool",
+        "you're cool",
+        "youre cool",
+        "you are great",
+        "you're great",
+        "youre great",
+        "you are awesome",
+        "you're awesome",
+        "youre awesome",
+        "you are fun",
+        "you're fun",
+        "youre fun",
+        "you are nice",
+        "you're nice",
+        "youre nice",
+        "you are sweet",
+        "you're sweet",
+        "youre sweet",
+        "this chat is great",
+        "this ai is great",
+        "this bot is great",
+        "i like this bot",
+        "i like this chat",
+        "i like this ai",
+        "you're funny",
+        "youre funny",
+        "you are helpful",
+        "you're helpful",
+        "youre helpful",
+        "you are actually helpful",
+        "you're actually helpful",
+        "youre actually helpful",
+        "this is cool",
+        "this is sick",
+        "this is so smart",
+        "i love this site",
+        "i love this portfolio",
+        "i love this experience",
+        "this ai is fun",
+      ];
+      for (const pat of complimentPatterns) {
+        if (lower.includes(pat)) {
+          expectingMoodReply = false;
+          expectingFollowupToSelfMood = false;
+          expectingGreetingReaction = false;
+          lastReplyWasSingleWordMood = false;
+          lastReplyHadSuggestions = false;
+          undecidedQuestionActive = false;
+          undecidedContext = null;
+          lastSuggestionsWereExtraOptions = false;
+
+          const complimentReplies = [
+            "Stoppp 😌",
+            "Look at us, being wholesome.",
+            "Aww, thanks. Now let me earn it. Want to see something cool?",
+          ];
+
+          const text = pick(complimentReplies);
+          return withWorkButton({
+            text,
+            showButton: false,
+          });
+        }
+      }
+
+      /* 0.2) Leaving / bye */
+      const leavingPhrases = [
+        "bye",
+        "goodbye",
+        "see ya",
+        "see you",
+        "see ya later",
+        "see you later",
+        "cya",
+        "later",
+        "gtg",
+        "g2g",
+        "gotta go",
+        "have to go",
+        "heading out",
+        "i'm out",
+        "im out",
+        "i am out",
+        "good night",
+        "goodnight",
+        "night",
+        "log off",
+        "logging off",
+        "logging off now",
+        "i'm going to sleep",
+        "im going to sleep",
+        "i'm going to bed",
+        "im going to bed",
+        "i should sleep",
+        "i'm off",
+        "im off",
+        "ok i'm done",
+        "ok im done",
+        "that's all i needed",
+        "thats all i needed",
+      ];
+      let isLeaving = false;
+      if (leavingPhrases.includes(baseNoPunctLower)) {
+        isLeaving = true;
+      } else {
+        for (const p of leavingPhrases) {
+          if (lower.includes(p)) {
+            isLeaving = true;
+            break;
+          }
+        }
+      }
+      if (isLeaving) {
+        expectingMoodReply = false;
+        expectingFollowupToSelfMood = false;
+        expectingGreetingReaction = false;
+        lastReplyWasSingleWordMood = false;
+        lastReplyHadSuggestions = false;
+        undecidedQuestionActive = false;
+        undecidedContext = null;
+        lastSuggestionsWereExtraOptions = false;
+
+        const byeLines = [
+          "See you around :)",
+          "Bye for now. Come back if you want to snoop more.",
+          "Later! I'll be here when you're curious again.",
+          "Thanks for hanging out. Catch you later.",
+        ];
+
+        const text = pick(byeLines);
+        return withWorkButton({
+          text,
+          showButton: false,
+          closeAfter: true,
+        });
+      }
+
+      /* 0.3) Follow-up to bot's self-mood answer */
+      if (expectingFollowupToSelfMood) {
+        const selfMoodPositivePhrases = [
+          "awesome",
+          "great",
+          "good",
+          "nice",
+          "nice one",
+          "nice to hear",
+          "good to hear",
+          "glad to hear",
+          "happy for you",
+          "love that",
+          "cool",
+          "cool cool",
+          "good for you",
+          "same",
+          "same here",
+          "same!",
+          "same haha",
+          "same lol",
+          "same tbh",
+          "same fr",
+        ];
+
+        let isPositiveReact = false;
+        if (selfMoodPositivePhrases.includes(baseNoPunctLower)) {
+          isPositiveReact = true;
+        } else {
+          for (const p of selfMoodPositivePhrases) {
+            if (lower.includes(p)) {
+              isPositiveReact = true;
+              break;
+            }
+          }
+        }
+
+        expectingFollowupToSelfMood = false;
+
+        if (isPositiveReact) {
+          expectingMoodReply = false;
+          lastReplyWasSingleWordMood = false;
+          lastReplyHadSuggestions = false;
+          undecidedQuestionActive = false;
+          undecidedContext = null;
+          expectingGreetingReaction = false;
+          lastSuggestionsWereExtraOptions = false;
+
+          return withWorkButton({
+            text: MOOD_QUESTION,
+            showButton: false,
+          });
+        }
+      }
+
+      /* 0.35) Direct "who made/built/created you" → fixed answer */
+      const whoMadeYouPatterns = [
+        "who made you",
+        "who made u",
+        "who made ya",
+        "who built you",
+        "who built u",
+        "who built ya",
+        "who created you",
+        "who created u",
+        "who created ya",
+        "who coded you",
+        "who coded u",
+        "who coded ya",
+        "who designed you",
+        "who designed u",
+        "who designed ya",
+        "who made this bot",
+        "who built this bot",
+        "who created this bot",
+        "who made this ai",
+        "who built this ai",
+        "who created this ai",
+        "who made this chat",
+        "who built this chat",
+        "who created this chat",
+      ];
+      for (const pat of whoMadeYouPatterns) {
+        if (squashedLower.includes(pat)) {
+          expectingMoodReply = false;
+          expectingFollowupToSelfMood = false;
+          expectingGreetingReaction = false;
+          lastReplyWasSingleWordMood = false;
+          lastReplyHadSuggestions = false;
+          undecidedQuestionActive = false;
+          undecidedContext = null;
+          lastSuggestionsWereExtraOptions = false;
+
+          const creatorLines = ["I built this whole thing myself! Design, code, the whole experience... all me."];
+
+          const text = pick(creatorLines);
+          return withWorkButton({
+            text,
+            showButton: false,
+          });
+        }
+      }
+
+      /* 0.36) "who are you" / identity questions */
+      const whoAreYouPatterns = [
+        "who are you",
+        "who r u",
+        "who are u",
+        "who is this",
+        "who am i talking to",
+        "who am i chatting with",
+        "who is the bot",
+        "who's this",
+        "whos this",
+        "what are you",
+        "what is this",
+        "who are you again",
+        "remind me who you are",
+      ];
+
+      let isWhoAreYou = false;
+      for (const p of whoAreYouPatterns) {
+        if (baseNoPunctLower === p || squashedLower.includes(p)) {
+          isWhoAreYou = true;
+          break;
+        }
+      }
+
+      if (isWhoAreYou) {
+        expectingMoodReply = false;
+        expectingFollowupToSelfMood = false;
+        expectingGreetingReaction = false;
+        lastReplyWasSingleWordMood = false;
+        lastReplyHadSuggestions = false;
+        undecidedQuestionActive = false;
+        undecidedContext = null;
+        lastSuggestionsWereExtraOptions = false;
+
+        return withWorkButton({
+          text: "I'm Kate. I made all of this. Nice to meet you!",
+          showButton: false,
+        });
+      }
+
+      /* 0.37) "something else" / similar → triggered ideas */
+      const somethingElsePatterns = [
+        "i want something else",
+        "something else",
+        "how about something else",
+        "that doesn't work for me",
+        "that doesnt work for me",
+        "give me a new idea",
+        "think of something else",
+        "show me something else",
+        "something different",
+        "something new",
+        "another idea",
+        "another one",
+        "another option",
+        "different idea",
+        "different option",
+        "different options",
+      ];
+      let wantsSomethingElse = false;
+      for (const pat of somethingElsePatterns) {
+        if (squashedLower.includes(pat)) {
+          wantsSomethingElse = true;
+          break;
+        }
+      }
+
+      if (wantsSomethingElse) {
+        const undecidedOptions = [
+          { key: "creative", question: "How about something creative?" },
+          { key: "visual", question: "How about more visual projects?" },
+          { key: "copy", question: "How about copy-heavy projects?" },
+        ];
+        const choice = pick(undecidedOptions);
+
+        undecidedQuestionActive = true;
+        undecidedContext = choice.key;
+        expectingMoodReply = false;
+        expectingFollowupToSelfMood = false;
+        lastReplyWasSingleWordMood = false;
+        lastReplyHadSuggestions = false;
+        lastSuggestionsWereExtraOptions = false;
+
+        return withWorkButton({
+          text: choice.question,
+          showButton: false,
+        });
+      }
+
+      /* 0.4) After suggestions: explicit no/something else */
+      if (lastReplyHadSuggestions) {
+        const noWords = ["no", "nope", "nah"];
+        const startsWithNoish =
+          noWords.includes(baseNoPunctLower) ||
+          baseNoPunctLower.startsWith("no ") ||
+          baseNoPunctLower.startsWith("no,") ||
+          baseNoPunctLower.startsWith("nope") ||
+          baseNoPunctLower.startsWith("nah");
+
+        const noSoftPhrases = [
+          "no thanks",
+          "no thank you",
+          "no sorry",
+          "no, i'm good",
+          "no im good",
+          "no, all good",
+          "no all good",
+          "no, nothing right now",
+          "no nothing right now",
+          "no, not right now",
+          "no not right now",
+        ];
+
+        let matchesNoSoft = false;
+        for (const p of noSoftPhrases) {
+          if (baseNoPunctLower.includes(p)) {
+            matchesNoSoft = true;
+            break;
+          }
+        }
+
+        const differentPhrases = [
+          "not those",
+          "something else",
+          "anything else",
+          "other options",
+          "other ideas",
+          "another option",
+          "another idea",
+          "different ones",
+          "different option",
+          "different options",
+          "not those ones",
+          "nah not those",
+        ];
+        let wantsDifferent = false;
+        for (const p of differentPhrases) {
+          if (baseNoPunctLower.includes(p)) {
+            wantsDifferent = true;
+            break;
+          }
+        }
+
+        if (startsWithNoish || matchesNoSoft || wantsDifferent) {
+          expectingMoodReply = false;
+          expectingFollowupToSelfMood = false;
+          expectingGreetingReaction = false;
+          lastReplyWasSingleWordMood = false;
+          undecidedQuestionActive = false;
+          undecidedContext = null;
+
+          if (lastSuggestionsWereExtraOptions) {
+            lastReplyHadSuggestions = false;
+            lastSuggestionsWereExtraOptions = false;
+            return withWorkButton({
+              text:
+                "Tell me what you'd like to see and I'll look around for you.",
+              showButton: false,
+            });
+          }
+
+          lastReplyHadSuggestions = true;
+          lastSuggestionsWereExtraOptions = true;
+
+          return withWorkButton({
+            text: "Got it. Here are some other options.",
+            showButton: false,
+            suggestions: EXTRA_OPTION_BUTTONS,
+          });
+        }
+      }
+
+      /* 0.41) Jokes */
+      const jokePatterns = [
+        "tell me a joke",
+        "tell me another joke",
+        "joke please",
+        "joke, please",
+        "make me laugh",
+        "say something funny",
+        "something funny",
+        "be funny",
+        "give me a joke",
+        "crack a joke",
+        "got any jokes",
+        "got a joke",
+        "another joke",
+      ];
+      let wantsJoke = false;
+      for (const pat of jokePatterns) {
+        if (squashedLower.includes(pat)) {
+          wantsJoke = true;
+          break;
+        }
+      }
+      if (!wantsJoke && squashedLower === "joke") {
+        wantsJoke = true;
+      }
+
+      if (wantsJoke) {
+        expectingMoodReply = false;
+        expectingFollowupToSelfMood = false;
+        expectingGreetingReaction = false;
+        lastReplyWasSingleWordMood = false;
+        lastReplyHadSuggestions = false;
+        undecidedQuestionActive = false;
+        undecidedContext = null;
+        lastSuggestionsWereExtraOptions = false;
+
+        const line = pick(JOKES);
+        return withWorkButton({
+          text: line.replace(/\n/g, "<br>"),
+          showButton: false,
+        });
+      }
+
+      /* 0.45) Capability / help / "what can you/ya/u do" / "what can i ask for" */
+      const capabilityPatterns = [
+        "what can i ask",
+        "what can i ask for",
+        "what else can i ask for",
+        "can you tell me all of the options",
+        "can you tell me all of the options?",
+        "what can i say",
+        "what can you do",
+        "what can ya do",
+        "what can u do",
+        "what can ya do for me",
+        "what can u do for me",
+        "what are you able to do",
+        "what do you do",
+        "tell me everything i can ask",
+        "tell me what i can ask",
+        "what can i search for",
+        "what can i search",
+        "what can i look for",
+        "what are all of your options",
+        "what are your options",
+        "what are the options",
+        "what are my options",
+        "what are all of my options",
+        "what are all options",
+        "what are all the options",
+        "what options do i have",
+        "what options are there",
+        "tell me my options",
+        "show me my options",
+        "show me the options",
+        "list my options",
+        "list the options",
+        "how can you help",
+        "how do i use this",
+        "how do i use you",
+        "how does this work",
+        "what can i do here",
+        "what can i do with this",
+        "what can i do with you",
+        "what can you show me",
+        "what kinds of things can you show",
+        "what are you here for",
+        "what do you help with",
+        "help",
+        "help me",
+        "i need help",
+        "i need assistance",
+        "assist me",
+        "can you help me",
+        "can you help",
+        "what should i ask",
+        "what could i ask",
+        "what should i search",
+        "what should i be asking",
+        "what should i look at",
+        "what should i look for",
+        "where should i start",
+        "how should i start",
+        "where do i start",
+        "what can i see",
+        "what can i see here",
+        "what can i see on this",
+        "what can i see in this",
+        "what is everything i can ask for",
+        "what is everything i can ask",
+        "everything i can ask for",
+        "everything i can ask",
+        "like what",
+      ];
+
+      let isCapabilityQuestion = false;
+      for (const p of capabilityPatterns) {
+        if (baseNoPunctLower === p || squashedLower.includes(p)) {
+          isCapabilityQuestion = true;
+          break;
+        }
+      }
+
+      // Extra regex-y catch for "what can ya/you/u do" variants
+      if (!isCapabilityQuestion) {
+        if (/\bwhat can (ya|you|u) do\b/.test(squashedLower)) {
+          isCapabilityQuestion = true;
+        }
+      }
+
+      // Extra catch for bare "options" / simple options phrases
+      if (!isCapabilityQuestion) {
+        const capabilityOptionsPatterns = [
+          "options",
+          "all options",
+          "all of my options",
+          "all of the options",
+          "my options",
+        ];
+        if (
+          capabilityOptionsPatterns.includes(baseNoPunctLower) ||
+          capabilityOptionsPatterns.includes(squashNoPunct)
+        ) {
+          isCapabilityQuestion = true;
+        }
+      }
+
+      if (isCapabilityQuestion) {
+        expectingMoodReply = false;
+        expectingFollowupToSelfMood = false;
+        expectingGreetingReaction = false;
+        lastReplyWasSingleWordMood = false;
+        lastReplyHadSuggestions = false;
+        undecidedQuestionActive = false;
+        undecidedContext = null;
+        lastSuggestionsWereExtraOptions = false;
+
+        let capabilityReply;
+        if (demoMode) {
+          capabilityReply = `
+<p>Right now you can chat with me, hear a joke, or play a quick game. Just type 'game' or 'tell me a joke'.</p>
+<p>You can also ask me what I'm working on next, or about Northeastern.</p>
+<p>Once I finish building things out, you'll be able to ask me to show you work across brand building, campaigns, writing, content strategy, UX, websites, and more.</p>
+          `.trim();
+        } else {
+          capabilityReply = `
+<p>You can ask me to show work across brand building, campaigns, writing, content strategy, UX, websites, communication, and fundraising materials. That covers social content and long-form pieces too.</p>
+<p>Just say any of those words and I'll get them for you!</p>
+<p><em>You can also ask me to play a game or tell you a joke :)</em></p>
+          `.trim();
+        }
+
+        return withWorkButton({
+          text: capabilityReply,
+          showButton: false,
+        });
+      }
+
+      /* 0.46) Direct category / option phrases → direction response */
+      const DIRECTION_INTENTS = [
+        {
+          label: "brand-building work",
+          keywords: [
+            "brand-building work",
+            "brand building work",
+            "brand building",
+            "brand-building",
+            "brand work",
+            "brand projects",
+            "brand project",
+            "brand",
+            "show me brand-building work",
+            "show me brand building work",
+            "show me brand work",
+            "show me brand projects",
+          ],
+        },
+        {
+          label: "campaign work",
+          keywords: [
+            "campaign work",
+            "campaigns",
+            "campaign",
+            "show me campaign work",
+            "show me campaigns",
+            "show me a campaign",
+          ],
+        },
+        {
+          label: "UX work",
+          keywords: [
+            "ux",
+            "ux work",
+            "ux projects",
+            "ux and product work",
+            "user experience work",
+            "show me ux",
+            "show me ux work",
+            "show me ux projects",
+            "show me ux and product work",
+          ],
+        },
+        {
+          label: "website projects",
+          keywords: [
+            "website projects",
+            "website project",
+            "websites",
+            "website",
+            "website work",
+            "site redesign",
+            "site redesigns",
+            "show me website projects",
+            "show me website work",
+            "show me websites",
+          ],
+        },
+        {
+          label: "content strategy work",
+          keywords: [
+            "content strategy work",
+            "content strategy",
+            "show me content strategy work",
+            "show me content strategy",
+          ],
+        },
+        {
+          label: "social content",
+          keywords: [
+            "social content",
+            "social posts",
+            "social media content",
+            "social",
+            "show me social content",
+            "show me social posts",
+            "show me social media content",
+          ],
+        },
+        {
+          label: "long-form writing",
+          keywords: [
+            "long-form writing",
+            "longform writing",
+            "long form writing",
+            "long-form",
+            "longform",
+            "long form",
+            "writing",
+            "copy",
+            "copywriting",
+            "show me long-form writing",
+            "show me longform writing",
+          ],
+        },
+        {
+          label: "fundraising and pitch work",
+          keywords: [
+            "fundraising and pitch work",
+            "fundraising work",
+            "fundraising",
+            "pitch work",
+            "fundraising materials",
+            "donor deck",
+            "pitch deck",
+            "show me fundraising and pitch work",
+            "show me fundraising work",
+            "show me pitch work",
+          ],
+        },
+      ];
+
+      for (const intent of DIRECTION_INTENTS) {
+        for (const key of intent.keywords) {
+          const k = key.toLowerCase();
+          if (
+            squashedLower === k ||
+            baseNoPunctLower === k ||
+            squashedLower.includes(k)
+          ) {
+            const actualResponse = `Love that. I'll show you ${intent.label}.`;
+            
+            if (demoMode) {
+              return {
+                text: `I'm still building that out, but I'd probably say something like "<em>${actualResponse}</em>"`,
+                showButton: true,
+                forceOverlay: true,
+                demoPreview: true,
+              };
+            }
+            
+            return withWorkButton({
+              text: actualResponse,
+              showButton: true,
+              forceOverlay: true,
+            });
+          }
+        }
+      }
+
+      /* 0.48) Laugh / "that's funny" reactions */
+      const laughExact = [
+        "lol",
+        "lol.",
+        "lol!",
+        "lmao",
+        "lmao.",
+        "lmao!",
+        "rofl",
+        "haha",
+        "haha.",
+        "haha!",
+        "hahaha",
+        "hahaha.",
+        "hahaha!",
+        "heh",
+        "heh.",
+        "heh!",
+      ];
+      const laughContains = [
+        "that's very funny",
+        "thats very funny",
+        "that's so funny",
+        "thats so funny",
+        "that's funny",
+        "thats funny",
+        "so funny",
+        "very funny",
+        "nice joke",
+        "good joke",
+        "great joke",
+        "good one",
+        "nice one",
+        "funny joke",
+      ];
+
+      let isLaugh = false;
+      if (
+        laughExact.includes(baseNoPunctLower) ||
+        laughExact.includes(squashNoPunct)
+      ) {
+        isLaugh = true;
+      } else {
+        for (const p of laughContains) {
+          if (lower.includes(p)) {
+            isLaugh = true;
+            break;
+          }
+        }
+      }
+
+      if (!isLaugh) {
+        // also treat classic "lolol", "lolllll", etc as laugh variations
+        if (/\blol+\b/.test(squashedLettersOnly) || /ha(ha)+/.test(squashedLettersOnly)) {
+          isLaugh = true;
+        }
+      }
+
+      if (isLaugh && !hasQuestionMark) {
+        expectingMoodReply = false;
+        expectingFollowupToSelfMood = false;
+        expectingGreetingReaction = false;
+        lastReplyWasSingleWordMood = false;
+        lastReplyHadSuggestions = false;
+        undecidedQuestionActive = false;
+        undecidedContext = null;
+        lastSuggestionsWereExtraOptions = false;
+
+        return withWorkButton({
+          text: "I know, I'm hilarious.",
+          showButton: false,
+        });
+      }
+
+      /* 0.5) Short ack / thanks style */
+      const ackPatterns = [
+        "ok",
+        "okay",
+        "ok thanks",
+        "okay thanks",
+        "ok thank you",
+        "okay thank you",
+        "thanks",
+        "thank you",
+        "thx",
+        "ty",
+        "sure",
+        "alright",
+        "all right",
+        "whatever",
+        "oh thanks",
+        "thanks for your help",
+        "thanks for all your help",
+        "thx for helping",
+        "got it",
+        "understood",
+        "thank u",
+        "tysm",
+        "thanks dude",
+        "thanks man",
+        "thanks friend",
+        "yesss",
+      ];
+      const ackContains = [
+        "oh thanks",
+        "thanks for your help",
+        "thanks for all your help",
+        "thx for helping",
+        "thanks a lot",
+        "thanks so much",
+        "thank you so much",
+        "appreciate it",
+        "appreciate that",
+        "appreciate you",
+        "appreciate it sm",
+        "that helps",
+        "that helped",
+        "this helps",
+        "this helped",
+        "got it",
+        "understood",
+        "makes sense",
+        "makes perfect sense",
+        "that's perfect",
+        "thats perfect",
+        "that's exactly what i meant",
+        "thats exactly what i meant",
+        "this is perfect",
+        "slay",
+        "this slaps",
+        "this is fire",
+      ];
+
+      if (!hasQuestionMark) {
+        if (
+          ackPatterns.includes(baseNoPunctLower) ||
+          ackPatterns.includes(squashNoPunct) ||
+          ackContains.some((p) => lower.includes(p))
+        ) {
+          const thanksForShowing =
+            lower.includes("showing me") ||
+            lower.includes("showing all this") ||
+            lower.includes("for the tour") ||
+            lower.includes("for the walkthrough") ||
+            lower.includes("for walking me through") ||
+            lower.includes("for showing this");
+
+          expectingMoodReply = false;
+          expectingFollowupToSelfMood = false;
+          expectingGreetingReaction = false;
+          lastReplyWasSingleWordMood = false;
+          lastReplyHadSuggestions = false;
+          undecidedQuestionActive = false;
+          undecidedContext = null;
+          lastSuggestionsWereExtraOptions = false;
+
+          const genericAckReplies = [
+            "Glad that helped. 🙂",
+            "Cool, I'm here if you need anything else.",
+            "If you get curious again, just tell me what you want to see.",
+          ];
+
+          const showingAckReplies = [
+            "Glad you liked seeing all that.",
+            "Happy that was helpful. You can always ask for something more specific.",
+            "Love that. If you want to keep going, tell me what you're curious about next.",
+          ];
+
+          const usePool = thanksForShowing
+            ? showingAckReplies
+            : genericAckReplies;
+
+          const text = pick(usePool);
+
+          return withWorkButton({
+            text,
+            showButton: false,
+          });
+        }
+      }
+
+      /* 0.6) undecided yes/no handler */
+      if (undecidedQuestionActive) {
+        const yesPatterns = [
+          "yes",
+          "yeah",
+          "yep",
+          "yup",
+          "yas",
+          "sure",
+          "sure thing",
+          "ok",
+          "okay",
+          "alright",
+          "all right",
+          "sounds good",
+          "sounds great",
+          "that sounds good",
+          "that sounds great",
+          "that's a good idea",
+          "thats a good idea",
+          "good idea",
+          "great idea",
+          "love that",
+          "fine",
+          "why not",
+          "let's do it",
+          "lets do it",
+          "do it",
+          "go for it",
+          "i like that",
+          "that works",
+          "works for me",
+        ];
+        const noPatterns = [
+          "no",
+          "nope",
+          "nah",
+          "not really",
+          "rather not",
+          "don't think so",
+          "dont think so",
+          "i'm good",
+          "im good",
+          "i'm okay",
+          "im okay",
+          "i'm fine",
+          "im fine",
+          "i'm all set",
+          "im all set",
+          "i'm okay for now",
+          "im okay for now",
+        ];
+
+        let isYes = false;
+        let isNo = false;
+
+        if (yesPatterns.includes(baseNoPunctLower)) {
+          isYes = true;
+        } else {
+          for (const p of yesPatterns) {
+            if (lower.includes(p)) {
+              isYes = true;
+              break;
+            }
+          }
+        }
+
+        if (!isYes) {
+          if (noPatterns.includes(baseNoPunctLower)) {
+            isNo = true;
+          } else {
+            for (const p of noPatterns) {
+              if (lower.includes(p)) {
+                isNo = true;
+                break;
+              }
+            }
+          }
+        }
+
+        if (isYes) {
+          undecidedQuestionActive = false;
+          undecidedContext = null;
+          expectingMoodReply = false;
+          expectingFollowupToSelfMood = false;
+          lastReplyWasSingleWordMood = false;
+          lastReplyHadSuggestions = false;
+          lastSuggestionsWereExtraOptions = false;
+          expectingGreetingReaction = false;
+
+          const actualResponse = "Sweet.";
+          
+          if (demoMode) {
+            return {
+              text: `I'm still building that out, but I'd probably say something like "<em>${actualResponse}</em>"`,
+              showButton: true,
+              demoPreview: true,
+            };
+          }
+
+          return withWorkButton({
+            text: actualResponse,
+            showButton: true,
+          });
+        }
+
+        if (isNo) {
+          const allContexts = ["creative", "visual", "copy"];
+          const remaining = allContexts.filter((c) => c !== undecidedContext);
+
+          function contextToButton(c) {
+            if (c === "creative") return "Show me something creative.";
+            if (c === "visual") return "Show me more visual projects.";
+            return "Show me copy-heavy projects.";
+          }
+
+          const suggestionButtons = remaining.map(contextToButton);
+
+          undecidedQuestionActive = false;
+          undecidedContext = null;
+          expectingMoodReply = false;
+          expectingFollowupToSelfMood = false;
+          lastReplyWasSingleWordMood = false;
+          lastReplyHadSuggestions = true;
+          lastSuggestionsWereExtraOptions = false;
+          expectingGreetingReaction = false;
+
+          return withWorkButton({
+            text: "Got it. Here are some other options.",
+            showButton: false,
+            suggestions: suggestionButtons,
+          });
+        }
+      }
+
+      /* 0.7) "Show me everything" / "you decide" */
+      const showEverythingPatterns = [
+        "show me everything",
+        "show everything",
+        "show all",
+        "see everything",
+        "see all your work",
+        "see all the work",
+        "i want to see everything",
+        "i wanna see everything",
+        "see all projects",
+        "show all projects",
+        "show me all projects",
+        "show me all your work",
+      ];
+      const youDecidePatterns = [
+        "you decide",
+        "you pick",
+        "you choose",
+        "ur pick",
+        "ur choice",
+        "your call",
+        "up to you",
+        "surprise me",
+        "pick for me",
+        "choose for me",
+        "decide for me",
+      ];
+
+      let wantsAll = false;
+      for (const p of showEverythingPatterns) {
+        if (squashedLower.includes(p)) {
+          wantsAll = true;
+          break;
+        }
+      }
+      if (!wantsAll) {
+        for (const p of youDecidePatterns) {
+          if (squashedLower.includes(p)) {
+            wantsAll = true;
+            break;
+          }
+        }
+      }
+
+      if (wantsAll) {
+        expectingMoodReply = false;
+        expectingFollowupToSelfMood = false;
+        expectingGreetingReaction = false;
+        lastReplyWasSingleWordMood = false;
+        lastReplyHadSuggestions = false;
+        undecidedQuestionActive = false;
+        undecidedContext = null;
+        lastSuggestionsWereExtraOptions = false;
+
+        const actualResponse = "You got it.";
+        
+        if (demoMode) {
+          return {
+            text: `I'm still building that out, but I'd probably say something like "<em>${actualResponse}</em>"`,
+            showButton: true,
+            demoPreview: true,
+          };
+        }
+
+        return withWorkButton({
+          text: actualResponse,
+          showButton: true,
+        });
+      }
+
+      /* 0.8) "Not sure / what do you think" */
+      const notSurePatterns = [
+        "not sure",
+        "idk",
+        "i don't know",
+        "i dont know",
+        "no idea",
+        "don't know what i want",
+        "dont know what i want",
+        "i can't decide",
+        "i cant decide",
+        "hard to choose",
+        "hard to pick",
+        "can't pick",
+        "cant pick",
+        "no clue",
+        "i'm indecisive",
+        "im indecisive",
+        "i'm torn",
+        "im torn",
+      ];
+      const whatDoYouThinkPatterns = [
+        "what do you think",
+        "what would you show",
+        "what would you show me",
+        "what do you suggest",
+        "what would you suggest",
+        "what do you recommend",
+        "what would you recommend",
+        "what should i look at",
+        "what should i look for",
+        "where should i start",
+        "how should i start",
+        "where do i start",
+      ];
+      const indecisiveMarkers = [...notSurePatterns, ...whatDoYouThinkPatterns];
+
+      let isIndecisive = false;
+      for (const p of indecisiveMarkers) {
+        if (squashedLower.includes(p)) {
+          isIndecisive = true;
+          break;
+        }
+      }
+
+      if (isIndecisive) {
+        const undecidedOptions = [
+          { key: "creative", question: "How about something creative?" },
+          { key: "visual", question: "How about more visual projects?" },
+          { key: "copy", question: "How about copy-heavy projects?" },
+        ];
+        const choice = pick(undecidedOptions);
+
+        undecidedQuestionActive = true;
+        undecidedContext = choice.key;
+        expectingMoodReply = true;
+        expectingFollowupToSelfMood = false;
+        lastReplyWasSingleWordMood = false;
+        lastReplyHadSuggestions = false;
+        lastSuggestionsWereExtraOptions = false;
+
+        return withWorkButton({
+          text: choice.question,
+          showButton: false,
+        });
+      }
+
+      /* 0.9) "Give me options / ideas" (expanded) */
+      const giveOptionsPatterns = [
+        "give me options",
+        "give me some options",
+        "give me a few options",
+        "give me a couple options",
+        "give me choices",
+        "i need options",
+        "options please",
+        "show me options",
+        "what are my options",
+        "any suggestions",
+        "got any suggestions",
+        "give me ideas",
+        "give me some ideas",
+        "give me a few ideas",
+        "give me a few more ideas",
+        "give me more ideas",
+        "give me additional ideas",
+        "give me extra ideas",
+        "give me new ideas",
+        "give me another idea",
+        "give me a couple ideas",
+        "i want more ideas",
+        "i want some ideas",
+        "i need ideas",
+        "need ideas",
+        "need more ideas",
+        "more ideas please",
+        "can i get more ideas",
+        "what about more ideas",
+        "what about some ideas",
+        "share some ideas",
+        "throw me some ideas",
+      ];
+
+      let wantsOptions = false;
+      for (const p of giveOptionsPatterns) {
+        if (squashedLower.includes(p)) {
+          wantsOptions = true;
+          break;
+        }
+      }
+      if (
+        !wantsOptions &&
+        squashedLower.includes("give me") &&
+        squashedLower.includes("options")
+      ) {
+        wantsOptions = true;
+      }
+      if (!wantsOptions && squashedLower.includes("more ideas")) {
+        wantsOptions = true;
+      }
+
+      if (wantsOptions) {
+        undecidedQuestionActive = false;
+        undecidedContext = null;
+        expectingMoodReply = false;
+        expectingFollowupToSelfMood = false;
+        expectingGreetingReaction = false;
+        lastReplyWasSingleWordMood = true;
+        lastReplyHadSuggestions = true;
+        lastSuggestionsWereExtraOptions = true;
+
+        return withWorkButton({
+          text: "Low maintenance. I like it. How about these?",
+          showButton: false,
+          suggestions: EXTRA_OPTION_BUTTONS,
+        });
+      }
+
+      /* 1) Follow-up after we asked about their mood/day */
+      if (expectingMoodReply) {
+        const mood = classifyMoodAfterHows(lower);
+        expectingMoodReply = false;
+
+        if (mood === "negative") {
+          lastReplyWasSingleWordMood = false;
+          lastSuggestionsWereExtraOptions = false;
+          return withWorkButton({
+            text:
+              "That doesn't sound fun. If you want, I can pull up some work that might be a good brain break.",
+            showButton: false,
+          });
+        } else {
+          lastReplyWasSingleWordMood = false;
+          lastSuggestionsWereExtraOptions = false;
+          return withWorkButton({
+            text: MOOD_QUESTION,
+            showButton: false,
+          });
+        }
+      }
+
+      /* 1.1) Mood one-word follow-up → suggestions */
+      if (lastReplyWasSingleWordMood) {
+        if (words.length === 1) {
+          const single = words[0];
+
+          const isGreetingSingle = greetingSingleWords.includes(single);
+          let isGreetingPhrase = false;
+          const joinedGreet = squashedLettersOnly;
+          for (const phrase of greetingPhrases) {
+            if (joinedGreet.includes(phrase)) {
+              isGreetingPhrase = true;
+              break;
+            }
+          }
+
+          if (!isGreetingSingle && !isGreetingPhrase) {
+            const suggestions = buildSuggestions();
+            lastReplyWasSingleWordMood = false;
+            lastReplyHadSuggestions = true;
+            lastSuggestionsWereExtraOptions = false;
+            return withWorkButton({
+              text: "Here are a few directions we could go:",
+              showButton: false,
+              suggestions,
+            });
+          }
+        }
+        lastReplyWasSingleWordMood = false;
+      }
+
+      /* 2) Greeting-only detection */
+      let isGreetingOnly = false;
+
+      if (words.length > 0 && words.length <= 4) {
+        for (const w of words) {
+          if (greetingSingleWords.includes(w)) {
+            isGreetingOnly = true;
+            break;
+          }
+        }
+        if (!isGreetingOnly) {
+          for (const phrase of greetingPhrases) {
+            if (squashedLettersOnly.includes(phrase)) {
+              isGreetingOnly = true;
+              break;
+            }
+          }
+        }
+      }
+
+      if (isGreetingOnly) {
+        const text = pick(GREETING_REPLIES);
+        const asksMood =
+          text.includes("your day going") ||
+          text.includes("what are you in the mood to look at");
+        expectingMoodReply = asksMood;
+        expectingFollowupToSelfMood = false;
+        lastReplyWasSingleWordMood = false;
+        lastReplyHadSuggestions = false;
+        undecidedQuestionActive = false;
+        undecidedContext = null;
+        expectingGreetingReaction = true;
+        lastSuggestionsWereExtraOptions = false;
+
+        return withWorkButton({
+          text,
+          showButton: false,
+        });
+      }
+
+      /* 3) "How are you?" (bot) */
+      const howArePatterns = [
+        "how are you",
+        "how r u",
+        "how are u",
+        "how's it going",
+        "hows it going",
+        "how are things",
+        "how are things with you",
+        "how you doing",
+        "how ya doing",
+        "how are ya",
+        "how u doing",
+        "how u doin",
+        "how's everything",
+        "hows everything",
+        "how's life",
+        "hows life",
+        "how you feeling",
+        "how you feelin",
+        "hru",
+        "wyd",
+      ];
+      for (const pattern of howArePatterns) {
+        if (squashedLower.includes(pattern)) {
+          const text = pick(SELF_MOOD_REPLIES);
+          expectingMoodReply = false;
+          expectingFollowupToSelfMood = true;
+          lastReplyWasSingleWordMood = false;
+          lastReplyHadSuggestions = false;
+          undecidedQuestionActive = false;
+          undecidedContext = null;
+          expectingGreetingReaction = false;
+          lastSuggestionsWereExtraOptions = false;
+          return withWorkButton({
+            text,
+            showButton: false,
+          });
+        }
+      }
+
+      /* 4) Creation / ownership questions */
+      const hasWho1 = squashedLower.includes("who");
+      const refersToSheOrKateOrCreator =
+        squashedLower.includes("she") ||
+        squashedLower.includes("kate") ||
+        squashedLower.includes("her") ||
+        squashedLower.includes("creator") ||
+        squashedLower.includes("project owner") ||
+        squashedLower.includes("owner") ||
+        squashedLower.includes("designer");
+
+      const hasBuildVerb =
+        /\b(code|coded|make|made|create|created|build|built|design|designed)\b/.test(
+          squashedLower
+        );
+      const hasTarget =
+        squashedLower.includes("website") ||
+        squashedLower.includes("site") ||
+        squashedLower.includes("chatbox") ||
+        squashedLower.includes("chat box") ||
+        squashedLower.includes("chat") ||
+        squashedLower.includes("ai") ||
+        squashedLower.includes("assistant") ||
+        squashedLower.includes("this");
+
+      const hasIdeaMention = squashedLower.includes("idea");
+
+      if (
+        (refersToSheOrKateOrCreator || hasWho1) &&
+        ((hasBuildVerb && hasTarget) || (hasIdeaMention && hasTarget))
+      ) {
+        lastReplyWasSingleWordMood = false;
+        lastReplyHadSuggestions = false;
+        expectingMoodReply = false;
+        expectingFollowupToSelfMood = false;
+        undecidedQuestionActive = false;
+        undecidedContext = null;
+        expectingGreetingReaction = false;
+        lastSuggestionsWereExtraOptions = false;
+
+        const creatorLines = ["I built this whole thing myself! Design, code, the whole experience... all me."];
+
+        const text = pick(creatorLines);
+        return withWorkButton({
+          text,
+          showButton: false,
+        });
+      }
+
+      /* 5) BEST-TYPE QUESTIONS */
+      const bestPhrases = [
+        "what is my best",
+        "what's my best",
+        "whats my best",
+        "the best",
+        "best project",
+        "best one",
+        "best work",
+        "show me the best",
+        "show me best",
+        "which is the best",
+        "what is the best",
+        "whats the best",
+        "what's the best",
+        "what's the coolest thing here",
+        "whats the coolest thing here",
+        "show me your favorite project",
+        "what's her favorite project",
+        "whats her favorite project",
+        "what's the one she brags about",
+        "whats the one she brags about",
+        "what's the main one",
+        "whats the main one",
+        "if i only see one thing, what should it be",
+        "what's the showstopper",
+        "whats the showstopper",
+        "what's the big one",
+        "whats the big one",
+      ];
+      for (const phrase of bestPhrases) {
+        if (squashedLower.includes(phrase)) {
+          lastReplyWasSingleWordMood = false;
+          lastReplyHadSuggestions = false;
+          expectingMoodReply = false;
+          expectingFollowupToSelfMood = false;
+          undecidedQuestionActive = false;
+          undecidedContext = null;
+          expectingGreetingReaction = false;
+          lastSuggestionsWereExtraOptions = false;
+          
+          const actualResponse = "Hard to pick favorites, but you might have one. Want to see a few?";
+          
+          if (demoMode) {
+            return {
+              text: `I'm still building that out, but I'd probably say something like "<em>${actualResponse}</em>"`,
+              showButton: true,
+              demoPreview: true,
+            };
+          }
+          
+          return withWorkButton({
+            text: actualResponse,
+            showButton: true,
+          });
+        }
+      }
+
+      /* 6) FAVORITE bucket */
+      const favoritePhrases = [
+        "favorite",
+        "favourite",
+        "fav",
+        "fave",
+        "the one you love",
+        "love most",
+        "loved the most",
+        "liked a lot",
+        "like the most",
+        "most proud",
+        "most proud of",
+        "proudest",
+        "the one you're proud of",
+        "the one you are proud of",
+        "top",
+        "#1",
+        "number one",
+        "no. 1",
+        "no 1",
+      ];
+      for (const phrase of favoritePhrases) {
+        if (squashedLower.includes(phrase)) {
+          lastReplyWasSingleWordMood = false;
+          lastReplyHadSuggestions = false;
+          expectingMoodReply = false;
+          expectingFollowupToSelfMood = false;
+          undecidedQuestionActive = false;
+          undecidedContext = null;
+          expectingGreetingReaction = false;
+          lastSuggestionsWereExtraOptions = false;
+          
+          const actualResponse = "Hard to pick favorites, but you might have one. Want to see a few?";
+          
+          if (demoMode) {
+            return {
+              text: `I'm still building that out, but I'd probably say something like "<em>${actualResponse}</em>"`,
+              showButton: true,
+              demoPreview: true,
+            };
+          }
+          
+          return withWorkButton({
+            text: actualResponse,
+            showButton: true,
+          });
+        }
+      }
+
+      /* 7) least-favorite projects + dislike → suggestions */
+      const wantsProjects =
+        squashedLower.includes("project") ||
+        squashedLower.includes("projects") ||
+        squashedLower.includes("work") ||
+        squashedLower.includes("pieces");
+      const asksLeastOrDislike =
+        squashedLower.includes("least favorite") ||
+        squashedLower.includes("least favourite") ||
+        squashedLower.includes("does not like") ||
+        squashedLower.includes("doesn't like") ||
+        squashedLower.includes("doesnt like") ||
+        squashedLower.includes("does not love") ||
+        squashedLower.includes("doesn't love") ||
+        squashedLower.includes("doesnt love") ||
+        squashedLower.includes("most cringe") ||
+        squashedLower.includes("any fails") ||
+        squashedLower.includes("which one flopped") ||
+        squashedLower.includes("what's the weakest piece") ||
+        squashedLower.includes("whats the weakest piece") ||
+        squashedLower.includes("anything she doesn't like anymore") ||
+        squashedLower.includes("anything she doesnt like anymore");
+      if (wantsProjects && asksLeastOrDislike) {
+        const suggestions = buildSuggestions();
+        lastReplyWasSingleWordMood = false;
+        lastReplyHadSuggestions = true;
+        expectingMoodReply = false;
+        expectingFollowupToSelfMood = false;
+        undecidedQuestionActive = false;
+        undecidedContext = null;
+        expectingGreetingReaction = false;
+        lastSuggestionsWereExtraOptions = false;
+        return withWorkButton({
+          text: "Here are a few directions we could go:",
+          showButton: false,
+          suggestions,
+        });
+      }
+
+      /* 8) WORST / LEAST FAVORITE / HATE (general) */
+      const negativePhrases2 = [
+        "least favorite",
+        "least favourite",
+        "worst",
+        "hate",
+        "hated",
+        "dislike",
+        "disliked",
+        "like the least",
+        "bad",
+        "terrible",
+        "awful",
+        "lame",
+        "gross",
+        "ugly",
+        "weakest",
+        "most cringe",
+        "any fails",
+        "which one flopped",
+      ];
+      for (const phrase of negativePhrases2) {
+        if (squashedLower.includes(phrase)) {
+          lastReplyWasSingleWordMood = false;
+          lastReplyHadSuggestions = false;
+          expectingMoodReply = false;
+          expectingFollowupToSelfMood = false;
+          undecidedQuestionActive = false;
+          undecidedContext = null;
+          expectingGreetingReaction = false;
+          lastSuggestionsWereExtraOptions = false;
+          
+          const actualResponse = "No 'worst' pile here. Just different flavors.";
+          
+          if (demoMode) {
+            return {
+              text: `I'm still building that out, but I'd probably say something like "<em>${actualResponse}</em>"`,
+              showButton: true,
+              demoPreview: true,
+            };
+          }
+          
+          return withWorkButton({
+            text: actualResponse,
+            showButton: true,
+          });
+        }
+      }
+
+      /* 9) About-Kate / creator patterns */
+      const aboutMePatterns = [
+        "tell me about kate",
+        "tell me about you",
+        "tell me about yourself",
+        "about you",
+        "about kate",
+        "about yourself",
+        "learn more about you",
+        "learn more about kate",
+        "who is kate",
+        "more about you",
+      ];
+      for (const pattern of aboutMePatterns) {
+        if (squashedLower.includes(pattern)) {
+          lastReplyWasSingleWordMood = false;
+          lastReplyHadSuggestions = false;
+          expectingMoodReply = false;
+          expectingFollowupToSelfMood = false;
+          undecidedQuestionActive = false;
+          undecidedContext = null;
+          expectingGreetingReaction = false;
+          lastSuggestionsWereExtraOptions = false;
+          
+          if (demoMode) {
+            return {
+              text: `I'm still building that out, but I'd probably say something like "<em>I tell that story here →</em>"`,
+              showButton: true,
+              link: aboutLink,
+              demoPreview: true,
+            };
+          }
+          
+          return withWorkButton({
+            text: "I tell that story here →",
+            showButton: true,
+            link: aboutLink,
+          });
+        }
+      }
+
+      const whoFlag = squashedLower.includes("who");
+      const whoAboutMe =
+        whoFlag &&
+        (squashedLower.includes("kate") ||
+          squashedLower.includes("you") ||
+          squashedLower.includes("designer"));
+
+      if (whoAboutMe) {
+        lastReplyWasSingleWordMood = false;
+        lastReplyHadSuggestions = false;
+        expectingMoodReply = false;
+        expectingFollowupToSelfMood = false;
+        undecidedQuestionActive = false;
+        undecidedContext = null;
+        expectingGreetingReaction = false;
+        lastSuggestionsWereExtraOptions = false;
+        
+        if (demoMode) {
+          return {
+            text: `I'm still building that out, but I'd probably say something like "<em>I tell that story here →</em>"`,
+            showButton: true,
+            link: aboutLink,
+            demoPreview: true,
+          };
+        }
+        
+        return withWorkButton({
+          text: "I tell that story here →",
+          showButton: true,
+          link: aboutLink,
+        });
+      }
+
+      /*11) One-word replies */
+      if (words.length === 1) {
+        const single = words[0];
+
+        const positiveSingleWords = [
+          "same",
+          "samee",
+          "sameee",
+          "same!",
+          "same.",
+          "same?",
+          "sameee?",
+          "yes",
+          "yeah",
+          "yep",
+          "yup",
+          "yas",
+          "sure",
+          "ok",
+          "okay",
+          "cool",
+          "nice",
+          "awesome",
+          "great",
+          "good",
+          "bet",
+          "fr",
+          "yess",
+          "yesss",
+        ];
+
+        if (positiveSingleWords.includes(single)) {
+          lastSuggestionsWereExtraOptions = false;
+          lastReplyWasSingleWordMood = false;
+          lastReplyHadSuggestions = false;
+          expectingMoodReply = false;
+          expectingFollowupToSelfMood = false;
+          undecidedQuestionActive = false;
+          undecidedContext = null;
+          expectingGreetingReaction = false;
+
+          return withWorkButton({
+            text: MOOD_QUESTION,
+            showButton: false,
+          });
+        }
+
+        const suggestions = buildSuggestions();
+        lastReplyWasSingleWordMood = false;
+        lastReplyHadSuggestions = true;
+        lastReplyHadSuggestions = true;
+        expectingMoodReply = false;
+        expectingFollowupToSelfMood = false;
+        undecidedQuestionActive = false;
+        undecidedContext = null;
+        expectingGreetingReaction = false;
+        lastSuggestionsWereExtraOptions = false;
+
+        return withWorkButton({
+          text: "Here are a few directions we could go:",
+          showButton: false,
+          suggestions,
+        });
+      }
+
+      /* 12) Default → project-based suggestions */
+      const suggestions = buildSuggestions();
+      lastReplyWasSingleWordMood = false;
+      lastReplyHadSuggestions = true;
+      expectingMoodReply = false;
+      expectingFollowupToSelfMood = false;
+      undecidedQuestionActive = false;
+      undecidedContext = null;
+      expectingGreetingReaction = false;
+      lastSuggestionsWereExtraOptions = false;
+      return withWorkButton({
+        text: "Here are a few directions we could go:",
+        showButton: false,
+        suggestions,
+      });
+    }
+
+    header.addEventListener("click", () => {
+      const isHidden = body.classList.contains("hidden");
+      if (isHidden) {
+        body.style.display = "block";
+        body.classList.remove("hidden");
+      } else {
+        body.classList.add("hidden");
+        body.style.display = "none";
+      }
+
+      if (!hasShownIntro && !body.classList.contains("hidden")) {
+        const intro =
+          "Hi, I'm here to do the wandering for you. Say what you want to see and I'll bring it over.";
+        const introMsg = appendMessage("assistant", "");
+        const displayText = ensureNotSameAsLastDisplay(intro);
+        typeText(introMsg.content, displayText, 30, () => {
+          lastAssistantText = displayText;
+        });
+        hasShownIntro = true;
+      }
+    });
+
+    function closeChatWithFade(lastMessageWrapper) {
+      if (closingInProgress) return;
+      closingInProgress = true;
+
+      inputEl.disabled = true;
+      sendBtn.disabled = true;
+
+      const children = Array.from(messagesEl.children);
+      children.forEach((child) => {
+        if (child === lastMessageWrapper) {
+          child.classList.add("fade-out-slow");
+        } else {
+          child.classList.add("fade-out-fast");
+        }
+      });
+
+      setTimeout(() => {
+        messagesEl.innerHTML = "";
+        body.classList.add("hidden");
+        body.style.display = "none";
+
+        hasShownIntro = false;
+
+        closingInProgress = false;
+        inputEl.disabled = false;
+        sendBtn.disabled = false;
+      }, 1400);
+    }
+
+    /* === GAME LOGIC === */
+
+    function createGameElement() {
+      const container = document.createElement("div");
+      container.className = "game-container";
+
+      const inner = document.createElement("div");
+      inner.className = "game-inner";
+
+      const score = document.createElement("div");
+      score.className = "game-score";
+      score.innerHTML = `HITS <span>0</span>`;
+
+      const canvas = document.createElement("canvas");
+      canvas.id = "pongCanvas";
+
+      const overlay = document.createElement("div");
+      overlay.className = "game-overlay-text";
+      overlay.textContent = "";            // hide countdown text initially
+      overlay.style.opacity = "0";         // fully hidden until after click overlay fade
+
+      const clickOverlay = document.createElement("div");
+      clickOverlay.className = "game-click-overlay";
+
+      const clickButton = document.createElement("button");
+      clickButton.className = "game-click-button";
+      clickButton.textContent = "Click to play!";
+
+      clickOverlay.appendChild(clickButton);
+
+      inner.appendChild(canvas);
+      inner.appendChild(score);
+      inner.appendChild(overlay);
+      inner.appendChild(clickOverlay);
+      container.appendChild(inner);
+
+      return {
+        container,
+        inner,
+        canvas,
+        overlay,
+        score,
+        clickOverlay,
+        clickButton,
+      };
+    }
+
+    function startPongGame(msgWrapper) {
+      if (activeGame) return;
+
+      // Expand the chat widget for the game
+      const chatWidget = document.getElementById('ai-chat-widget');
+      if (chatWidget) {
+        chatWidget.classList.add('expanded-game');
+      }
+
+      msgWrapper.classList.add("game-wrapper");
+
+      const gameEls = createGameElement();
+      msgWrapper.appendChild(gameEls.container);
+      messagesEl.appendChild(msgWrapper);
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+
+      const canvas = gameEls.canvas;
+      const ctx = canvas.getContext("2d");
+
+      // Wait briefly for expansion animation before sizing canvas
+      setTimeout(() => {
+        const rect = gameEls.inner.getBoundingClientRect();
+        canvas.width = rect.width;
+        canvas.height = rect.height;
+        setupGame();
+      }, 150);
+
+      function setupGame() {
+      let running = false;
+      let animationId = null;
+      let hits = 0;
+
+      const wallThickness = 5;
+      const paddleThickness = 5;
+
+      const wallPadding = 12;
+      const wallX = 18;
+      const wallHeight = canvas.height - wallPadding * 2;
+
+      const paddleWidth = paddleThickness;
+      const paddleHeight = 60;
+      let paddleX = canvas.width - 10 - paddleWidth;
+      let paddleY = (canvas.height - paddleHeight) / 2;
+
+      let ballRadius = 7;
+      let ballX = canvas.width / 2;
+      let ballY = canvas.height / 2;
+
+      let ballVisible = false;
+      let ballAlpha = 1;
+
+      let baseSpeed = 3;
+      let speedMultiplier = 1;
+      let ballSpeedX = baseSpeed;
+      let ballSpeedY = baseSpeed * 0.5;
+
+      const maxSpeedMultiplier = 3.0;
+
+      const scoreValueEl = gameEls.score.querySelector("span");
+
+      function resetBall(direction) {
+        ballX = canvas.width / 2;
+        ballY = canvas.height / 2;
+        speedMultiplier = 1 + hits * 0.08;
+        if (speedMultiplier > maxSpeedMultiplier)
+          speedMultiplier = maxSpeedMultiplier;
+
+        const dir = direction || (Math.random() > 0.5 ? 1 : -1);
+        ballSpeedX = baseSpeed * dir * speedMultiplier;
+        ballSpeedY =
+          baseSpeed * 0.5 * (Math.random() > 0.5 ? 1 : -1) * speedMultiplier;
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Left wall (white)
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(wallX, wallPadding, wallThickness, wallHeight);
+
+        // Right paddle (white)
+        ctx.fillRect(paddleX, paddleY, paddleWidth, paddleHeight);
+
+        // Ball (white)
+        if (!ballVisible) return;
+
+        ctx.save();
+        ctx.globalAlpha = ballAlpha;
+        ctx.beginPath();
+        ctx.arc(ballX, ballY, ballRadius, 0, Math.PI * 2);
+        ctx.fillStyle = "#ffffff";
+        ctx.fill();
+        ctx.closePath();
+        ctx.restore();
+      }
+
+      function step() {
+        if (!running) return;
+
+        ballX += ballSpeedX;
+        ballY += ballSpeedY;
+
+        // Top / bottom bounce
+        if (ballY - ballRadius <= 0 || ballY + ballRadius >= canvas.height) {
+          ballSpeedY *= -1;
+        }
+
+        // Left wall bounce
+        if (
+          ballX - ballRadius <= wallX + wallThickness &&
+          ballY >= wallPadding &&
+          ballY <= wallPadding + wallHeight
+        ) {
+          ballX = wallX + wallThickness + ballRadius + 0.5;
+          ballSpeedX *= -1;
+        }
+
+        // Right paddle collision
+        if (
+          ballX + ballRadius >= paddleX &&
+          ballX - ballRadius <= paddleX + paddleWidth &&
+          ballY >= paddleY &&
+          ballY <= paddleY + paddleHeight
+        ) {
+          ballX = paddleX - ballRadius - 0.5;
+          ballSpeedX *= -1;
+          hits += 1;
+          scoreValueEl.textContent = hits.toString();
+
+          speedMultiplier = 1 + hits * 0.1;
+          if (speedMultiplier > maxSpeedMultiplier)
+            speedMultiplier = maxSpeedMultiplier;
+
+          const signX = ballSpeedX > 0 ? 1 : -1;
+          const signY = ballSpeedY > 0 ? 1 : -1;
+          ballSpeedX = baseSpeed * signX * speedMultiplier;
+          ballSpeedY =
+            (baseSpeed * 0.5 + hits * 0.05) * signY * speedMultiplier;
+        }
+
+        // Missed paddle (game over)
+        if (ballX - ballRadius > canvas.width + 5) {
+          activeGame && activeGame.endGame();
+          return;
+        }
+
+        draw();
+        animationId = requestAnimationFrame(step);
+      }
+
+      function updatePaddleFromClientY(clientY) {
+        const bounds = canvas.getBoundingClientRect();
+        const y = clientY - bounds.top;
+        const paddleHeight = 60;
+        paddleY = y - paddleHeight / 2;
+        if (paddleY < 0) paddleY = 0;
+        if (paddleY > canvas.height - paddleHeight) {
+          paddleY = canvas.height - paddleHeight;
+        }
+        draw();
+      }
+
+      function handleMouseMove(e) {
+        updatePaddleFromClientY(e.clientY);
+      }
+
+      canvas.addEventListener("mousemove", handleMouseMove);
+
+      // allow moving paddle even while "Click to play" overlay is shown
+      if (gameEls.clickOverlay) {
+        gameEls.clickOverlay.addEventListener("mousemove", (e) => {
+          updatePaddleFromClientY(e.clientY);
+        });
+      }
+      if (gameEls.clickButton) {
+        gameEls.clickButton.addEventListener("mousemove", (e) => {
+          updatePaddleFromClientY(e.clientY);
+        });
+      }
+
+      function startAfterCountdown() {
+        let count = 3;
+
+        ballVisible = false;
+        ballAlpha = 0;
+        draw();
+
+        gameEls.overlay.style.opacity = "1"; // show countdown only after click overlay is gone
+        gameEls.overlay.textContent = count;
+
+        const countdownInterval = setInterval(() => {
+          count--;
+          if (count > 0) {
+            gameEls.overlay.textContent = count;
+          } else if (count === 0) {
+            gameEls.overlay.textContent = "GO!";
+          } else {
+            clearInterval(countdownInterval);
+            gameEls.overlay.classList.add("fade-out");
+
+            setTimeout(() => {
+              if (gameEls.overlay && gameEls.overlay.parentNode) {
+                gameEls.overlay.parentNode.removeChild(gameEls.overlay);
+              }
+
+              ballVisible = true;
+              ballAlpha = 0;
+              let fadeStart = null;
+
+              function fadeBall(timestamp) {
+                if (!fadeStart) fadeStart = timestamp;
+                const progress = Math.min((timestamp - fadeStart) / 500, 1);
+                ballAlpha = progress;
+                draw();
+
+                if (progress < 1) {
+                  requestAnimationFrame(fadeBall);
+                } else {
+                  ballAlpha = 1;
+                  running = true;
+                  resetBall(-1);
+                  if (activeGame) activeGame.started = true;
+                  step();
+                }
+              }
+
+              requestAnimationFrame(fadeBall);
+            }, 650);
+          }
+
+          draw();
+        }, 900);
+      }
+
+      function endGame() {
+        running = false;
+        if (animationId) cancelAnimationFrame(animationId);
+
+        // Shrink the chat widget back
+        const chatWidget = document.getElementById('ai-chat-widget');
+        if (chatWidget) {
+          chatWidget.classList.remove('expanded-game');
+        }
+
+        const goOverlay = document.createElement("div");
+        goOverlay.className = "game-overlay-text";
+        goOverlay.textContent = "GAME OVER";
+        gameEls.inner.appendChild(goOverlay);
+
+        gameEls.inner.style.transition = "opacity 0.5s ease";
+        gameEls.inner.style.opacity = "0.3";
+
+        setTimeout(() => {
+          gameEls.container.classList.add("game-fade-out");
+          setTimeout(() => {
+            if (gameEls.container && gameEls.container.parentNode) {
+              gameEls.container.parentNode.removeChild(gameEls.container);
+            }
+
+            messagesEl.classList.remove("hide-scrollbar");
+            msgWrapper.classList.remove("game-wrapper"); // restore normal AI bubble background
+
+            const tryAgainBtn = document.createElement("button");
+            tryAgainBtn.className = "try-again-btn";
+            tryAgainBtn.textContent = "Try again";
+            tryAgainBtn.addEventListener("click", (e) => {
+              e.preventDefault();
+              if (tryAgainBtn.parentNode) {
+                tryAgainBtn.parentNode.removeChild(tryAgainBtn);
+              }
+              activeGame = null;
+              startPongGame(msgWrapper);
+            });
+            msgWrapper.appendChild(tryAgainBtn);
+            messagesEl.scrollTop = messagesEl.scrollHeight;
+
+            activeGame = null;
+          }, 900);
+        }, 900);
+      }
+
+      // fast fade & removal for when user types instead of playing
+      function quickEndGame() {
+        running = false;
+        if (animationId) cancelAnimationFrame(animationId);
+
+        // Shrink the chat widget back
+        const chatWidget = document.getElementById('ai-chat-widget');
+        if (chatWidget) {
+          chatWidget.classList.remove('expanded-game');
+        }
+
+        gameEls.inner.style.transition = "opacity 0.2s ease";
+        gameEls.inner.style.opacity = "0.3";
+
+        gameEls.container.classList.add("game-fade-out");
+        setTimeout(() => {
+          if (gameEls.container && gameEls.container.parentNode) {
+            gameEls.container.parentNode.removeChild(gameEls.container);
+          }
+          messagesEl.classList.remove("hide-scrollbar");
+          msgWrapper.classList.remove("game-wrapper"); // restore AI bubble when game is dismissed early
+          activeGame = null;
+        }, 400);
+      }
+
+      draw();
+
+      messagesEl.classList.add("hide-scrollbar");
+      activeGame = {
+        container: gameEls.container,
+        endGame,
+        quickEndGame,
+        started: false,
+      };
+
+      if (gameEls.clickButton && gameEls.clickOverlay) {
+        gameEls.clickButton.addEventListener("click", (e) => {
+          e.preventDefault();
+          gameEls.clickButton.disabled = true;
+          gameEls.clickOverlay.classList.add("fade-out");
+          setTimeout(() => {
+            if (gameEls.clickOverlay && gameEls.clickOverlay.parentNode) {
+              gameEls.clickOverlay.parentNode.removeChild(gameEls.clickOverlay);
+            }
+            startAfterCountdown();
+          }, 500);
+        });
+      }
+      } // end setupGame
+    }
+
+    // === VISION REVEAL: Progressive display of the future roadmap ===
+    function displayVisionContent() {
+      // Disable input during vision reveal
+      inputEl.disabled = true;
+      inputEl.placeholder = "...";
+      
+      const visionSequence = [
+        {
+          type: 'text',
+          content: `<span class="vision-text">You know that vibe check you just did?</span>`,
+          delay: 400
+        },
+        {
+          type: 'text',
+          content: `<span class="vision-text">That wasn't just for fun. The way you moved through it, the rhythm you created, how long you lingered... that's <em>data</em>. That's your vibe.</span>`,
+          delay: 2200
+        },
+        {
+          type: 'text',
+          content: `<span class="vision-text">Right now I'm not doing anything with it. But here's where this goes:</span>`,
+          delay: 2000
+        },
+        {
+          type: 'roadmap',
+          delay: 1600
+        },
+        {
+          type: 'northeastern',
+          delay: 3200
+        },
+        {
+          type: 'closing',
+          delay: 2400
+        }
+      ];
+
+      let cumulativeDelay = 0;
+      
+      visionSequence.forEach((item) => {
+        cumulativeDelay += item.delay;
+        
+        setTimeout(() => {
+          if (item.type === 'text') {
+            const typingEl = showTypingIndicator();
+            setTimeout(() => {
+              removeTypingIndicator(typingEl);
+              const msg = appendMessage("assistant", "");
+              msg.content.style.opacity = "0";
+              msg.content.innerHTML = item.content;
+              msg.content.style.transition = "opacity 0.6s ease";
+              setTimeout(() => { msg.content.style.opacity = "1"; }, 50);
+              messagesEl.scrollTop = messagesEl.scrollHeight;
+            }, 800);
+          }
+          
+          else if (item.type === 'roadmap') {
+            const msg = appendMessage("assistant", "");
+            msg.content.innerHTML = `
+              <div class="vision-roadmap">
+                <div class="vision-step" id="vs1">
+                  <span class="step-num">1</span>
+                  <span class="step-text"><strong>Your interaction patterns train a model.</strong> Fast and chaotic? Slow and deliberate? Playful? That shapes everything next.</span>
+                </div>
+                <div class="vision-step" id="vs2">
+                  <span class="step-num">2</span>
+                  <span class="step-text"><strong>The whole site adapts to you.</strong> Colors. Layout. How I talk to you. The sounds. All based on who you seem to be.</span>
+                </div>
+                <div class="vision-step" id="vs3">
+                  <span class="step-num">3</span>
+                  <span class="step-text"><strong>Projects show up differently.</strong> Methodical people get process breakdowns. Fast movers get outcomes. Same work, different lens.</span>
+                </div>
+                <div class="vision-step" id="vs4">
+                  <span class="step-num">4</span>
+                  <span class="step-text"><strong>This chat becomes real.</strong> Not if-statements. A model fine-tuned on my voice that actually holds a conversation.</span>
+                </div>
+              </div>`;
+            
+            // Stagger reveal each step
+            setTimeout(() => { document.getElementById('vs1').classList.add('step-visible'); messagesEl.scrollTop = messagesEl.scrollHeight; }, 300);
+            setTimeout(() => { document.getElementById('vs2').classList.add('step-visible'); messagesEl.scrollTop = messagesEl.scrollHeight; }, 700);
+            setTimeout(() => { document.getElementById('vs3').classList.add('step-visible'); messagesEl.scrollTop = messagesEl.scrollHeight; }, 1100);
+            setTimeout(() => { document.getElementById('vs4').classList.add('step-visible'); messagesEl.scrollTop = messagesEl.scrollHeight; }, 1500);
+          }
+          
+          else if (item.type === 'northeastern') {
+            const msg = appendMessage("assistant", "");
+            msg.content.innerHTML = `
+              <div class="neu-section" id="neu-sec">
+                <p>I can design this. I can code the frontend. But I need to learn how to build the systems underneath. The ML, the NLP, the recommender architecture. That's what Northeastern is for. I want to make AI that pays attention to people.</p>
+              </div>`;
+            setTimeout(() => { 
+              document.getElementById('neu-sec').classList.add('section-visible'); 
+              messagesEl.scrollTop = messagesEl.scrollHeight;
+            }, 100);
+          }
+          
+          else if (item.type === 'closing') {
+            const msg = appendMessage("assistant", "");
+            msg.content.innerHTML = `<span class="vision-text">That vibe check was step one. You just helped me collect the first signal.</span><br><br><button class="vision-back-btn" id="back-btn" onclick="shrinkVisionChat()">Got it</button>`;
+            msg.content.style.opacity = "0";
+            msg.content.style.transition = "opacity 0.6s ease";
+            setTimeout(() => { 
+              msg.content.style.opacity = "1"; 
+              messagesEl.scrollTop = messagesEl.scrollHeight;
+            }, 50);
+            setTimeout(() => { 
+              document.getElementById('back-btn').classList.add('btn-visible'); 
+            }, 800);
+          }
+        }, cumulativeDelay);
+      });
+    }
+
+    // Shrink chat back gracefully when user clicks button
+    window.shrinkVisionChat = function() {
+      const chatWidget = document.getElementById('ai-chat-widget');
+      if (chatWidget) {
+        chatWidget.classList.add('shrinking-back');
+        chatWidget.classList.remove('expanded-vision');
+      }
+      
+      // After shrink animation completes, show the continuation message
+      setTimeout(() => {
+        const typingEl = showTypingIndicator();
+        setTimeout(() => {
+          removeTypingIndicator(typingEl);
+          const transitionMsg = appendMessage("assistant", "");
+          typeText(transitionMsg.content, "Alright. Want to chat, hear a joke, or type 'game'?", 25, () => {
+            inputEl.disabled = false;
+            inputEl.placeholder = "Type here...";
+            inputEl.focus();
+            justSawIntro = true;
+            
+            if (chatWidget) {
+              chatWidget.classList.remove('shrinking-back');
+            }
+          });
+        }, 700);
+      }, 850);
+    };
+
+    function handleSend() {
+      if (closingInProgress) return;
+
+      const text = inputEl.value.trim();
+      if (!text) return;
+      inputEl.value = "";
+
+      // if a game is visible (whether started or not), fade it out quickly
+      if (activeGame) {
+        activeGame.quickEndGame();
+      }
+
+      const normalized = text.toLowerCase().replace(/[.!?]+$/g, "").trim();
+      if (normalized === lastUserNormalized) {
+        repeatCount += 1;
+      } else {
+        lastUserNormalized = normalized;
+        repeatCount = 1;
+      }
+
+      appendMessage("user", text);
+
+      const typingEl = showTypingIndicator();
+
+      setTimeout(() => {
+        removeTypingIndicator(typingEl);
+        const reply = generateReply(text);
+
+        // === SPECIAL HANDLING: Vision Reveal ===
+        if (reply.text === "__VISION_REVEAL__") {
+          // Expand the chat widget
+          const chatWidget = document.getElementById('ai-chat-widget');
+          if (chatWidget) {
+            chatWidget.classList.add('expanded-vision');
+          }
+          
+          // Display the vision content progressively
+          displayVisionContent();
+          return;
+        }
+
+        // NEW: adjust visible text so it's never exactly the same as last time
+        const displayText = ensureNotSameAsLastDisplay(reply.text);
+
+        const msg = appendMessage("assistant", "");
+        typeText(msg.content, displayText, 25, () => {
+          // AFTER text has finished typing, then handle buttons / closing
+
+          if (reply.closeAfter) {
+            closeChatWithFade(msg.wrapper);
+            lastAssistantText = displayText;
+            return;
+          }
+
+          if (reply.suggestions && Array.isArray(reply.suggestions)) {
+            // multiple options: fade in quickly, one by one
+            reply.suggestions.forEach((s, index) => {
+              const btn = document.createElement("button");
+              btn.className = "suggest-btn";
+              btn.textContent = s;
+              btn.style.animationDelay = `${index * 80}ms`;
+              if (demoMode) {
+                btn.style.opacity = "0.5";
+                btn.style.cursor = "not-allowed";
+              }
+              btn.addEventListener("click", (e) => {
+                e.preventDefault();
+                if (demoMode) return; // Buttons don't work in demo mode
+                inputEl.value = s;
+                handleSend();
+              });
+              msg.wrapper.appendChild(btn);
+            });
+            messagesEl.scrollTop = messagesEl.scrollHeight;
+          } else if (reply.showButton) {
+            // single "Take Me" style button
+            const btn = document.createElement("button");
+            btn.className = "take-me-btn";
+
+            const favoriteLineText =
+              "Hard to pick favorites, but you might have one. Want to see a few?";
+
+            const overlayTriggerTexts = [
+              favoriteLineText,
+              "Sweet.",
+              "You got it.",
+            ];
+
+            const isOverlayLine =
+              reply.forceOverlay || overlayTriggerTexts.includes(reply.text);
+
+            btn.textContent = "Take Me";
+
+            // In demo mode, buttons don't work (except game)
+            if (demoMode) {
+              btn.style.opacity = "0.5";
+              btn.style.cursor = "not-allowed";
+              btn.addEventListener("click", (e) => {
+                e.preventDefault();
+              });
+            } else if (isOverlayLine) {
+              let opened = false;
+              btn.addEventListener("click", (e) => {
+                e.preventDefault();
+                if (!whiteOverlay) return;
+
+                if (!opened) {
+                  if (typeof clearXTimer === "function") {
+                    clearXTimer();
+                  }
+                  if (typeof resetOverlayGrid === "function") {
+                    resetOverlayGrid();
+                  }
+                  whiteOverlay.classList.add("active");
+                  if (typeof syncCloseButtonY === "function") {
+                    syncCloseButtonY();
+                  }
+                  if (typeof spinOnce === "function") {
+                    xRevealTimer = setTimeout(() => {
+                      const cb = document.getElementById("closeButton");
+                      if (cb) {
+                        cb.classList.add("revealed");
+                        spinOnce(cb);
+                      }
+                    }, 600);
+                  }
+
+                  btn.textContent = "Go back";
+                  opened = true;
+                } else {
+                  if (typeof closeOverlay === "function") {
+                    closeOverlay();
+                  } else {
+                    whiteOverlay.classList.remove("active");
+                  }
+
+                  if (!whiteOverlay || !whiteOverlay.classList.contains("active")) {
+                    btn.textContent = "Take Me";
+                    opened = false;
+                  }
+                }
+              });
+            } else if (reply.link) {
+              btn.addEventListener("click", (e) => {
+                e.preventDefault();
+                window.location.href = reply.link;
+              });
+            } else {
+              btn.addEventListener("click", (e) => {
+                e.preventDefault();
+              });
+            }
+
+            msg.wrapper.appendChild(btn);
+            messagesEl.scrollTop = messagesEl.scrollHeight;
+          }
+
+          // update lastAssistantText AFTER we've decided what we actually showed
+          lastAssistantText = displayText;
+        });
+
+        messagesEl.scrollTop = messagesEl.scrollHeight;
+
+        if (reply.showGame) {
+          startPongGame(msg.wrapper);
+          messagesEl.scrollTop = messagesEl.scrollHeight;
+        }
+      }, 1600); // typing indicator shows a bit longer before reply
+    }
+
+    sendBtn.addEventListener("click", handleSend);
+    inputEl.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") handleSend();
+    });
+  })();
+</script>
