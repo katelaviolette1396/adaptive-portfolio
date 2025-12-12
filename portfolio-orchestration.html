@@ -1,0 +1,3799 @@
+<!DOCTYPE html>
+<html lang="en" style="margin:0!important;padding:0!important;background:#0d1117!important;">
+<head>
+<script>document.documentElement.style.cssText='margin:0!important;padding:0!important;background:#0d1117!important;';document.addEventListener('DOMContentLoaded',function(){document.body.style.cssText='margin:0!important;padding:0!important;background:#0d1117!important;';});</script>
+<style>html,body{margin:0!important;padding:0!important;background:#0d1117!important;height:100%!important;min-height:100%!important;overflow:hidden!important;}</style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Text Cycle</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<script>
+  (function () {
+    var ua = navigator.userAgent || navigator.vendor || window.opera || "";
+    var isMobile = /Mobi|Android|iP(ad|hone|od)|Tablet|Mobile|Phone/i.test(ua);
+    
+    // Mobile blocked - show typing message on dark background
+    if (isMobile) {
+      document.write('<!DOCTYPE html><html class="mobile-blocked" style="margin:0!important;padding:0!important;background:#0d1117!important;"><head><meta name="viewport" content="width=device-width,initial-scale=1"><style>@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=swap");*,*::before,*::after{margin:0!important;padding:0!important;box-sizing:border-box;}html,body{height:100%!important;min-height:100%!important;background:#0d1117!important;overflow:hidden!important;}#mobile-blocked-screen{display:flex;position:fixed;inset:0;width:100vw;height:100vh;background:#0d1117;z-index:999999;align-items:center;justify-content:center;flex-direction:column;padding:20px;}#mobile-message-container{display:flex;align-items:center;max-width:90%;}#mobile-message-text{font-family:"JetBrains Mono",monospace;font-size:16px;color:#7ee787;line-height:1.8;text-align:center;white-space:pre-line;}#mobile-cursor{display:inline-block;width:10px;height:20px;background:#7ee787;margin-left:2px;animation:blink 1s infinite;align-self:flex-end;margin-bottom:3px;}@keyframes blink{0%,50%{opacity:1;}51%,100%{opacity:0;}}</style></head><body style="margin:0!important;padding:0!important;background:#0d1117!important;"><div id="mobile-blocked-screen"><div id="mobile-message-container"><span id="mobile-message-text"></span><span id="mobile-cursor"></span></div></div><script>var msg="Some things are worth sitting down for.\\nPlease use a desktop computer.";var el=document.getElementById("mobile-message-text");var i=0;function t(){if(i<msg.length){el.textContent+=msg.charAt(i);i++;setTimeout(t,30+Math.random()*50);}};setTimeout(t,500);<\/script></body></html>');
+      document.close();
+      return;
+    }
+    
+    // Browser detection - only allow Chrome and Firefox
+    // Chrome UA contains "Chrome" but not "Edg" (Edge), "OPR" (Opera), or "Brave"
+    // Firefox UA contains "Firefox"
+    // Safari UA contains "Safari" but NOT "Chrome"
+    var isChrome = ua.indexOf('Chrome') !== -1 && ua.indexOf('Edg') === -1 && ua.indexOf('OPR') === -1 && ua.indexOf('Brave') === -1;
+    var isFirefox = ua.indexOf('Firefox') !== -1;
+    var isSupportedBrowser = isChrome || isFirefox;
+    
+    // Block unsupported browsers (Safari, Edge, Opera, etc.) on desktop
+    if (!isSupportedBrowser) {
+      document.documentElement.classList.add("browser-blocked");
+      // Immediately write the blocked message to ensure it shows
+      document.write('<!DOCTYPE html><html class="browser-blocked" style="margin:0!important;padding:0!important;background:#0d1117!important;"><head><meta name="viewport" content="width=device-width,initial-scale=1"><style>@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=swap");*,*::before,*::after{margin:0!important;padding:0!important;box-sizing:border-box;}html,body{height:100%!important;min-height:100%!important;background:#0d1117!important;overflow:hidden!important;}#browser-blocked-screen{display:flex;position:fixed;inset:0;width:100vw;height:100vh;background:#0d1117;z-index:999999;align-items:center;justify-content:center;flex-direction:column;}#browser-message-container{display:flex;align-items:center;}#browser-message-text{font-family:"JetBrains Mono",monospace;font-size:16px;color:#7ee787;line-height:1.8;white-space:pre-line;}#browser-cursor{display:inline-block;width:10px;height:20px;background:#7ee787;margin-left:2px;animation:blink 1s infinite;align-self:flex-end;margin-bottom:3px;}@keyframes blink{0%,50%{opacity:1;}51%,100%{opacity:0;}}</style></head><body style="margin:0!important;padding:0!important;background:#0d1117!important;"><div id="browser-blocked-screen"><div id="browser-message-container"><span id="browser-message-text"></span><span id="browser-cursor"></span></div></div><script>var msg="Safari and I are not on speaking terms yet.\\nPlease use Chrome or Firefox.";var el=document.getElementById("browser-message-text");var i=0;function t(){if(i<msg.length){el.textContent+=msg.charAt(i);i++;setTimeout(t,30+Math.random()*50);}};setTimeout(t,500);<\/script></body></html>');
+      document.close();
+    }
+  })();
+</script>
+<style>
+@import url("https://fonts.googleapis.com/css2?family=Poppins&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap");
+
+:root {
+  --overlay-shift: 0.74rem;
+  --perspective-transition-duration: 2s;
+}
+
+/* ============ ANTI-COPY PROTECTION ============ */
+* {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+img, video {
+  -webkit-user-drag: none;
+  -khtml-user-drag: none;
+  -moz-user-drag: none;
+  -o-user-drag: none;
+  user-drag: none;
+  pointer-events: none;
+}
+
+/* Re-enable for input field */
+#intro-ai-input {
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
+}
+
+/* ============ MOBILE BLOCKED - handled via document.write ============ */
+
+/* ============ BROWSER BLOCKED - handled via document.write ============ */
+
+.page-hidden * {
+  animation-play-state: paused !important;
+  transition: none !important;
+}
+
+.all-paused,
+.all-paused *,
+.all-paused *::before,
+.all-paused *::after {
+  animation-play-state: paused !important;
+  transition-duration: 0s !important;
+  transition-delay: 0s !important;
+}
+
+.all-paused video,
+.all-paused iframe {
+  pointer-events: none;
+}
+
+html,
+body,
+.white-overlay {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+html {
+  margin: 0 !important;
+  padding: 0 !important;
+  background: #0d1117 !important;
+  min-height: 100%;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar,
+.white-overlay::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+body {
+  background: #0d1117;
+  margin: 0 !important;
+  padding: 0 !important;
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+/* Body gets white background only after code explanation fades */
+body.show-white-bg {
+  background: white;
+  margin: 2rem;
+}
+
+/* ============ CODE TYPING EXPLANATION ============ */
+#code-explanation {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  background: #0d1117;
+  z-index: 10010;
+  display: flex;
+  flex-direction: column;
+  padding: 30px 50px 100px 50px;
+  box-sizing: border-box;
+  font-family: 'JetBrains Mono', 'SF Mono', Monaco, Consolas, monospace;
+  overflow: hidden;
+  transition: opacity 1.5s ease-out;
+  margin: 0 !important;
+}
+
+#code-explanation.fade-out {
+  opacity: 0;
+  pointer-events: none;
+}
+
+#code-lines {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding-bottom: 20px;
+  scroll-behavior: smooth;
+}
+
+#code-lines::-webkit-scrollbar {
+  width: 6px;
+}
+
+#code-lines::-webkit-scrollbar-track {
+  background: rgba(255,255,255,0.05);
+}
+
+#code-lines::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.2);
+  border-radius: 3px;
+}
+
+#code-lines::-webkit-scrollbar-thumb:hover {
+  background: rgba(255,255,255,0.3);
+}
+
+.code-line {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  flex-shrink: 0;
+}
+
+.code-line.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.line-number {
+  color: rgba(255,255,255,0.25);
+  font-size: 11px;
+  min-width: 24px;
+  text-align: right;
+  user-select: none;
+}
+
+.line-content {
+  color: rgba(255,255,255,0.75);
+  font-size: 12px;
+  line-height: 1.5;
+  flex: 1;
+}
+
+.line-content .comment {
+  color: #7ee787;
+}
+
+.line-content .keyword {
+  color: #ff7b72;
+}
+
+.line-content .string {
+  color: #a5d6ff;
+}
+
+.line-content .function {
+  color: #d2a8ff;
+}
+
+.line-content .variable {
+  color: #ffa657;
+}
+
+.line-content .number {
+  color: #79c0ff;
+}
+
+.cursor-blink {
+  display: inline-block;
+  width: 8px;
+  height: 14px;
+  background: rgba(255,255,255,0.7);
+  margin-left: 2px;
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+#continue-prompt {
+  position: absolute;
+  bottom: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  opacity: 0;
+  transition: opacity 0.8s ease;
+}
+
+#continue-prompt.visible {
+  opacity: 1;
+}
+
+#spacebar-text {
+  color: rgba(255,255,255,0.7);
+  font-size: 14px;
+  font-family: 'JetBrains Mono', monospace;
+  animation: blinkText 1.2s ease-in-out infinite;
+}
+
+@keyframes blinkText {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+#intro-ai-widget,
+#intro-ai-widget * {
+  font-family: "Poppins", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  box-sizing: border-box;
+}
+
+#intro-ai-widget {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 360px;
+  max-width: 90%;
+  z-index: 10002;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 1.5s ease-in-out;
+}
+
+#intro-ai-widget.fade-in {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+#intro-ai-widget.fade-out {
+  opacity: 0;
+  pointer-events: none;
+}
+
+#intro-ai-body {
+  background: rgba(60, 60, 60, 0.35);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 24px;
+  padding: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.28);
+}
+
+#intro-ai-messages {
+  height: 180px;
+  overflow: hidden;
+  font-size: 13px;
+  margin-bottom: 10px;
+  padding-right: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+#intro-ai-messages.compact {
+  height: 60px;
+  margin-bottom: 0;
+}
+
+#intro-ai-messages::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+.intro-ai-message,
+.intro-user-message {
+  max-width: 90%;
+  padding: 8px 12px;
+  border-radius: 18px;
+  line-height: 1.4;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  transition: opacity 0.4s ease-out;
+}
+
+.intro-ai-message {
+  align-self: flex-start;
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  border-bottom-left-radius: 4px;
+}
+
+.intro-user-message {
+  align-self: flex-end;
+  background: rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+  border-bottom-right-radius: 4px;
+}
+
+.intro-user-message.fade-out-message {
+  opacity: 0;
+}
+
+.intro-ai-label,
+.intro-user-label {
+  display: block;
+  font-size: 10px;
+  opacity: 0.8;
+  margin-bottom: 2px;
+  color: #ffffff;
+}
+
+.intro-typing-indicator {
+  opacity: 0.7;
+  font-style: italic;
+  color: #ffffff;
+}
+
+#intro-ai-input-row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+  padding: 6px 8px 6px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+#intro-ai-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: #ffffff;
+  font-size: 13px;
+}
+
+#intro-ai-input::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+#intro-ai-send {
+  border: none;
+  outline: none;
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  background: rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+  cursor: pointer;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
+}
+
+#intro-ai-send:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  background: rgba(255, 255, 255, 0.35);
+}
+
+#intro-ai-send:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+#vibe-chat-widget {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 99999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 1.5s ease-in-out;
+  font-family: "Poppins", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* FIX: Keep pointer-events none on the widget container, only button is clickable */
+#vibe-chat-widget.visible {
+  opacity: 1;
+  pointer-events: none;
+}
+
+#vibe-chat-widget.fade-out {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Block ALL children of vibe-chat-widget by default */
+#vibe-chat-widget *,
+#vibe-chat-widget *::before,
+#vibe-chat-widget *::after {
+  pointer-events: none !important;
+}
+
+/* ONLY the button is clickable, and ONLY when widget is visible */
+#vibe-chat-widget.visible #vibeTriggerButton {
+  pointer-events: auto !important;
+  cursor: pointer;
+  background: rgba(0, 0, 0, 0.8);
+  border: none;
+}
+
+#vibe-chat-widget.visible #vibeTriggerButton:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.32);
+  background: rgba(60, 60, 60, 0.45);
+}
+
+#vibe-chat-widget.visible #vibeTriggerButton:active {
+  transform: translateY(0);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.28);
+}
+
+#vibe-chat-body {
+  background: rgba(60, 60, 60, 0.35);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 24px;
+  padding: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.28);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: none !important;
+}
+
+#vibe-chat-message {
+  min-width: 180px;
+  min-height: 50px;
+  padding: 8px 12px;
+  border-radius: 18px;
+  line-height: 1.4;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  align-self: flex-start;
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  border-bottom-left-radius: 4px;
+  pointer-events: none !important;
+}
+
+.chat-label {
+  display: block;
+  font-size: 10px;
+  opacity: 0.8;
+  margin-bottom: 2px;
+  color: #ffffff;
+}
+
+#vibe-chat-text {
+  font-size: 13px;
+  color: #ffffff;
+  line-height: 1.4;
+}
+
+#vibe-slider-row {
+  opacity: 1;
+  visibility: visible;
+  padding: 8px 4px 4px 4px;
+  display: flex;
+  justify-content: center;
+}
+
+#vibe-slider-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  padding: 0 2px;
+}
+
+.vibe-label {
+  font-size: 11px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  transition: opacity 0.2s ease, transform 0.2s ease, color 0.2s ease;
+  user-select: none;
+}
+
+.vibe-label:hover {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.vibe-label.active {
+  color: #ffffff;
+  transform: scale(1.05);
+}
+
+#vibe-slider-track {
+  position: relative;
+  width: 100%;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+#vibe-slider-fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.3) 0%,
+    rgba(255, 255, 255, 0.4) 33%,
+    rgba(255, 255, 255, 0.5) 66%,
+    rgba(255, 255, 255, 0.6) 100%
+  );
+  border-radius: 4px;
+  transition: width 0.05s ease-out;
+}
+
+#vibe-slider-thumb {
+  position: absolute;
+  top: 50%;
+  left: 0%;
+  transform: translate(-50%, -50%);
+  width: 20px;
+  height: 20px;
+  background: white;
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  cursor: grab;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+#vibe-slider-thumb:hover {
+  transform: translate(-50%, -50%) scale(1.1);
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.4);
+}
+
+#vibe-slider-thumb:active {
+  cursor: grabbing;
+  transform: translate(-50%, -50%) scale(1.05);
+}
+
+#vibe-slider-thumb::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 6px;
+  height: 6px;
+  background: rgba(60, 60, 60, 0.4);
+  border-radius: 50%;
+}
+
+#play-button-container {
+  position: fixed;
+  top: 82%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  gap: 12px;
+  z-index: 99999;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.8s ease-in-out;
+}
+
+#play-button-container.visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+#mood-slider-container {
+  position: fixed;
+  top: 82%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 99999;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.8s ease-in-out;
+  pointer-events: none;
+}
+
+#mood-slider-container.visible {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+#mood-slider-wrapper {
+  background: rgba(60, 60, 60, 0.35);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 24px;
+  padding: 24px 40px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.28);
+  min-width: 320px;
+}
+
+#mood-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: opacity 0.5s ease;
+}
+
+#mood-controls.fading-out {
+  opacity: 0;
+  pointer-events: none;
+}
+
+#strudelDoneButton {
+  margin-top: 10px;
+  align-self: center;
+  opacity: 0;
+  pointer-events: none;
+  cursor: default;
+  transition: opacity 0.5s ease;
+  padding-inline: 18px;
+  background: rgba(0, 0, 0, 0.8);
+  border: none;
+}
+
+.arrow-up-btn {
+  font-size: 18px;
+  line-height: 1;
+}
+
+#strudelDoneButton.visible {
+  opacity: 1;
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+#mood-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  padding: 0 2px;
+}
+
+.mood-label {
+  font-family: "Poppins", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  color: #ffffff;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  user-select: none;
+}
+
+.mood-label:hover {
+  opacity: 1;
+}
+
+.mood-label.active {
+  opacity: 1;
+  transform: scale(1.05);
+}
+
+#mood-slider-track {
+  position: relative;
+  width: 100%;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+#mood-slider-fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.3) 0%,
+    rgba(255, 255, 255, 0.4) 33%,
+    rgba(255, 255, 255, 0.5) 66%,
+    rgba(255, 255, 255, 0.6) 100%
+  );
+  border-radius: 4px;
+  transition: width 0.05s ease-out;
+}
+
+#mood-slider-thumb {
+  position: absolute;
+  top: 50%;
+  left: 0%;
+  transform: translate(-50%, -50%);
+  width: 20px;
+  height: 20px;
+  background: white;
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  cursor: grab;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+#mood-slider-thumb:hover {
+  transform: translate(-50%, -50%) scale(1.1);
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.4);
+}
+
+#mood-slider-thumb:active {
+  cursor: grabbing;
+  transform: translate(-50%, -50%) scale(1.05);
+}
+
+#mood-slider-thumb::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 6px;
+  height: 6px;
+  background: rgba(60, 60, 60, 0.4);
+  border-radius: 50%;
+}
+
+.video-arrow-btn {
+  border: none;
+  outline: none;
+  border-radius: 24px;
+  padding: 14px 24px;
+  font-size: 14px;
+  font-weight: 500;
+  background: rgba(60, 60, 60, 0.35);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  color: #ffffff;
+  cursor: default;
+  pointer-events: none;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.28);
+  font-family: "Poppins", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* ============ INTRO VIDEO - COMPLETELY NON-CLICKABLE ============ */
+.intro-video-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  z-index: 10000;
+  background: white;
+  padding-bottom: 20vh;
+  pointer-events: none !important;
+  opacity: 0;
+  transition: opacity 2s ease-in-out;
+  cursor: default;
+}
+
+.intro-video-container.visible {
+  opacity: 1;
+  pointer-events: none !important;
+}
+
+.intro-video-container.fade-out-video {
+  opacity: 0;
+  pointer-events: none !important;
+}
+
+/* Ensure video wrapper is never clickable */
+.intro-video-container .video-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  transition: transform 0.8s ease-out;
+  cursor: default;
+  overflow: hidden;
+  padding: 2px;
+  margin: -2px;
+  pointer-events: none !important;
+}
+
+.intro-video-container.video-grown .video-wrapper {
+  transform: scale(1.3);
+  pointer-events: none !important;
+}
+
+.intro-video-container.video-grow-on-resume .video-wrapper {
+  transform: scale(1.15);
+  transition: transform 0.4s ease-out;
+  pointer-events: none !important;
+}
+
+/* Ensure video element is never clickable */
+.intro-video-container video {
+  max-width: 90vw;
+  max-height: 70vh;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  background: white;
+  cursor: default;
+  transform: scale(1.01);
+  -webkit-transform: scale(1.01);
+  pointer-events: none !important;
+}
+
+.intro-video-container video:focus,
+.intro-video-container video:active,
+.intro-video-container video:hover {
+  outline: none;
+  pointer-events: none !important;
+}
+
+.intro-video-container.video-grown video,
+.intro-video-container.video-grow-on-resume video {
+  transform: scale(1.01);
+  -webkit-transform: scale(1.01);
+  pointer-events: none !important;
+}
+
+/* Additional fallback - ensure ALL children of intro-video-container are non-clickable */
+.intro-video-container * {
+  pointer-events: none !important;
+}
+
+.main-content {
+  opacity: 0;
+  transition: opacity 2s ease-in-out;
+  position: relative;
+  z-index: 10001;
+}
+
+.main-content.visible {
+  opacity: 1;
+}
+
+.container {
+  display: flex;
+  align-items: flex-start;
+  gap: 8rem;
+  position: relative;
+  z-index: 10002;
+  transition: opacity 1s ease-in-out, transform 1s ease-in-out;
+}
+
+.container.fade-out-for-perspective {
+  opacity: 0;
+  transform: translateY(30px);
+  pointer-events: none;
+}
+
+.container.slide-up-out {
+  transform: translateY(-150vh);
+  pointer-events: none;
+  transition: transform 3s linear;
+}
+
+.static-text {
+  font-family: "Poppins", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 1.6rem;
+  color: black;
+  line-height: 1.2;
+}
+
+.index-button {
+  background: none;
+  border: none;
+  font-family: "Poppins", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 1.6rem;
+  color: black;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1.2;
+  position: relative;
+  z-index: 10;
+}
+
+.index-button:hover {
+  text-decoration: underline;
+}
+
+.message-container {
+  font-family: "Poppins", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 1.6rem;
+  color: black;
+  position: relative;
+  width: 350px;
+  height: 3.5em;
+  overflow: hidden;
+}
+
+.message {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  visibility: hidden;
+  animation: popCycle 160s steps(8) infinite;
+  line-height: 1.2;
+}
+
+.message:nth-child(1) {
+  animation-delay: calc(var(--offset, 0s) + 0s);
+}
+.message:nth-child(2) {
+  animation-delay: calc(var(--offset, 0s) + 20s);
+}
+.message:nth-child(3) {
+  animation-delay: calc(var(--offset, 0s) + 40s);
+}
+.message:nth-child(4) {
+  animation-delay: calc(var(--offset, 0s) + 60s);
+}
+.message:nth-child(5) {
+  animation-delay: calc(var(--offset, 0s) + 80s);
+}
+.message:nth-child(6) {
+  animation-delay: calc(var(--offset, 0s) + 100s);
+}
+.message:nth-child(7) {
+  animation-delay: calc(var(--offset, 0s) + 120s);
+}
+.message:nth-child(8) {
+  animation-delay: calc(var(--offset, 0s) + 140s);
+}
+
+@keyframes popCycle {
+  0% {
+    visibility: visible;
+  }
+  12.5% {
+    visibility: visible;
+  }
+  12.5001% {
+    visibility: hidden;
+  }
+  100% {
+    visibility: hidden;
+  }
+}
+
+.offset0 {
+  --offset: 0s;
+}
+.offset1 {
+  --offset: -20s;
+}
+.offset2 {
+  --offset: -40s;
+}
+.offset3 {
+  --offset: -60s;
+}
+.offset4 {
+  --offset: -80s;
+}
+.offset5 {
+  --offset: -100s;
+}
+.offset6 {
+  --offset: -120s;
+}
+.offset7 {
+  --offset: -140s;
+}
+
+.white-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: white;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 2.4s ease-in-out, visibility 0s linear 2.4s;
+  z-index: 9999;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  padding: 2rem;
+  box-sizing: border-box;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.white-overlay.active {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 1s ease-in-out, visibility 0s linear 0s;
+  pointer-events: auto;
+  overflow-y: hidden;
+  overscroll-behavior: contain;
+}
+
+.white-overlay.expanded {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.white-overlay.closing {
+  transition: opacity 1.6s ease-in-out, visibility 0s linear 1.6s;
+}
+
+.overlay-title {
+  position: absolute;
+  top: calc(1rem + var(--overlay-shift));
+  left: 2rem;
+  font-family: "Poppins", sans-serif;
+  font-size: 1.6rem;
+  font-weight: 400;
+  color: black;
+  line-height: 2rem;
+  display: flex;
+  align-items: center;
+  height: 40px;
+  z-index: 10000;
+  pointer-events: auto;
+  opacity: 1;
+  transition: opacity 2.4s ease-in-out;
+}
+
+.overlay-title.quick {
+  transition: opacity 240ms ease;
+}
+
+.overlay-title.fade-out {
+  opacity: 0;
+}
+
+.close-button {
+  position: absolute;
+  top: calc(-0.94rem + var(--overlay-shift));
+  right: 0.75rem;
+  background: none;
+  border: none;
+  font-size: 2rem;
+  cursor: pointer;
+  color: black;
+  padding: 0;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10001;
+  touch-action: manipulation;
+  transition: transform 320ms ease, opacity 240ms ease;
+  will-change: transform, opacity;
+  opacity: 0;
+  pointer-events: none;
+  user-select: none;
+  --scrollY: 0px;
+  --spin: 0deg;
+  transform: translateY(var(--scrollY)) rotate(var(--spin));
+  font-family: "Poppins", sans-serif;
+  font-weight: 400;
+}
+
+.close-button.revealed {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.close-button:hover {
+  background-color: transparent;
+}
+
+.close-button.spin {
+  --spin: 180deg;
+}
+
+@media screen and (min-width: 481px) {
+  .white-overlay .close-button {
+    font-size: 2.6rem;
+    top: calc(-0.3rem + var(--overlay-shift));
+  }
+}
+
+/* ============ SAFARI WHEEL FIX - Full width and smooth animations ============ */
+.full-bleed-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100vw;
+  height: 100vh;
+  max-width: none;
+  z-index: 10001;
+  overflow: visible;
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  pointer-events: none;
+}
+
+.testimonial-widget {
+  padding: 20px;
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  position: relative;
+  z-index: 10001;
+  overflow: visible;
+  margin-top: -240px;
+  height: calc(100vh + 80px);
+  min-height: 600px;
+  width: 100%;
+  transition: transform 3s linear;
+  box-sizing: border-box;
+}
+
+.testimonial-widget.slide-up {
+  transform: translateY(-300vh);
+}
+
+.testimonial-widget.returned {
+  transform: translateY(60px);
+}
+
+.testimonial-widget .testimonial-container {
+  max-width: none;
+  width: 100%;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  overflow: visible;
+  perspective: 1200px;
+  -webkit-perspective: 1200px;
+  perspective-origin: center 35%;
+  -webkit-perspective-origin: center 35%;
+}
+
+.testimonial-widget .images-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 0;
+  width: 100%;
+  position: relative;
+  height: calc(100% - 120px);
+  transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
+  overflow: visible;
+  transform: rotateX(10deg);
+  -webkit-transform: rotateX(10deg);
+}
+
+.testimonial-widget .image-container {
+  position: absolute;
+  transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
+  transform-origin: center center;
+  -webkit-transform-origin: center center;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  overflow: visible;
+  background: transparent;
+  transition: transform 0.6s ease-out, opacity 0.5s ease-out;
+  -webkit-transition: -webkit-transform 0.6s ease-out, opacity 0.5s ease-out;
+  /* Safari fix: will-change for smoother animations */
+  will-change: transform, opacity;
+  -webkit-will-change: transform, opacity;
+}
+
+.testimonial-widget .image-container-inner {
+  display: inline-block;
+  position: relative;
+  transform-origin: center center;
+  -webkit-transform-origin: center center;
+  will-change: transform;
+  -webkit-will-change: transform;
+  overflow: visible;
+  background: transparent;
+  transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
+}
+
+.testimonial-widget .image-container-inner img,
+.testimonial-widget .image-container-inner video {
+  display: block;
+  width: auto;
+  height: auto;
+  max-height: 280px;
+  max-width: 100%;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  image-rendering: auto;
+  opacity: 1;
+  transform-origin: center center;
+  -webkit-transform-origin: center center;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  background: transparent;
+  /* Safari fix: smoother animations */
+  will-change: transform, max-height;
+  -webkit-will-change: transform, max-height;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+.testimonial-widget .blank-placeholder {
+  width: 190px;
+  height: 280px;
+  background-color: #f0f0f0;
+  border: 2px dashed #ccc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: Arial, sans-serif;
+  font-size: 10px;
+  color: #666;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.info-label {
+  display: none;
+}
+
+#strudelContainer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 10004;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 1.5s ease-in-out;
+}
+
+#strudelContainer.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+#wheelIntroMessage {
+  position: fixed;
+  bottom: 18%;
+  right: 8%;
+  z-index: 10005;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 1.5s ease-in-out;
+  font-family: "Poppins", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+#wheelIntroMessage.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+#wheelIntroMessage .chat-bubble {
+  background: rgba(60, 60, 60, 0.35);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 24px;
+  padding: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.28);
+}
+
+#wheelIntroMessage .chat-message {
+  width: 320px;
+  min-height: 50px;
+  padding: 8px 12px;
+  border-radius: 18px;
+  line-height: 1.4;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  border-bottom-left-radius: 4px;
+}
+
+#wheelIntroText {
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+#strudelFrame {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+@media screen and (max-width: 480px) and (orientation: portrait) {
+  body {
+    margin: 1rem;
+    overflow-x: hidden;
+  }
+
+  .container {
+    flex-direction: row;
+    gap: calc(2rem * (100vw / 375px));
+    align-items: flex-start;
+    justify-content: space-between;
+    text-align: left;
+    width: 100%;
+  }
+
+  .container .static-text:first-child {
+    margin-left: -6vw;
+  }
+
+  .static-text {
+    font-size: calc(0.95rem * (100vw / 375px));
+  }
+
+  .index-button {
+    font-size: calc(0.95rem * (100vw / 375px));
+  }
+
+  .container .static-text:last-child .index-button {
+    position: fixed !important;
+    right: 1rem !important;
+    left: auto !important;
+    top: auto !important;
+    bottom: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    transform: none !important;
+    z-index: 100 !important;
+  }
+
+  .white-overlay .close-button {
+    right: calc(1rem - 2rem) !important;
+  }
+
+  .white-overlay .overlay-title {
+    font-family: "Poppins", sans-serif !important;
+    font-weight: 400 !important;
+    font-style: normal !important;
+    font-size: calc(0.95rem * (100vw / 375px)) !important;
+    line-height: 1.2 !important;
+    left: 1rem !important;
+  }
+
+  :root {
+    --overlay-shift: 0.6rem;
+  }
+
+  .white-overlay .overlay-title {
+    top: calc(1rem + var(--overlay-shift)) !important;
+  }
+
+  .white-overlay .close-button {
+    top: calc(-0.94rem + var(--overlay-shift)) !important;
+  }
+
+  .message-container {
+    display: none;
+  }
+
+  .testimonial-widget {
+    margin-left: 0;
+  }
+
+  .testimonial-widget .image-container:not(.has-content) .image-container-inner {
+    width: 44px;
+    height: 62px;
+  }
+
+  .testimonial-widget .image-container:not(.has-content) .image-container-inner img,
+  .testimonial-widget .image-container:not(.has-content) .image-container-inner video {
+    width: 100%;
+    height: 100%;
+  }
+
+  .full-bleed-wrapper {
+    transform: translateY(180px) scale(0.5);
+    transform-origin: top center;
+    left: -80px;
+  }
+
+  .white-overlay {
+    transform: none;
+  }
+
+  .info-label {
+    position: fixed;
+    right: 1rem;
+    bottom: 1rem;
+    font-family: "Poppins", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+    font-size: calc(0.95rem * (100vw / 375px));
+    color: black;
+    line-height: 1.2;
+    z-index: 10;
+    display: block;
+  }
+
+  .testimonial-widget .blank-placeholder {
+    font-size: 8px;
+  }
+  
+  #code-explanation {
+    padding: 20px 20px;
+  }
+  
+  .line-content {
+    font-size: 10px;
+  }
+  
+  .line-number {
+    font-size: 9px;
+    min-width: 18px;
+  }
+}
+
+@media screen and (max-height: 480px) and (orientation: landscape) {
+  body {
+    margin: 0.5rem 1rem;
+  }
+
+  .static-text {
+    font-size: 0.9rem;
+    line-height: 1.1;
+  }
+
+  .index-button {
+    font-size: 0.9rem;
+    line-height: 1.1;
+  }
+
+  .message-container {
+    font-size: 0.9rem;
+    line-height: 1.1;
+    height: 2.6em;
+  }
+
+  .message {
+    line-height: 1.1;
+  }
+
+  .message-container {
+    transform: translateX(-28px);
+  }
+
+  .container .static-text:last-child {
+    transform: translateX(-52px);
+  }
+
+  .overlay-title {
+    top: calc(1.9rem + var(--overlay-shift));
+  }
+
+  .close-button {
+    top: calc(0.25rem + var(--overlay-shift));
+  }
+
+  .testimonial-widget {
+    margin-top: 52px;
+    height: calc(100vh - 140px);
+    min-height: 360px;
+  }
+
+  .testimonial-widget .images-row {
+    width: 100vw;
+    height: calc(100% - 90px);
+  }
+
+  .testimonial-widget .image-container:not(.has-content) .image-container-inner {
+    width: 44px;
+    height: 62px;
+  }
+
+  .testimonial-widget .image-container:not(.has-content) .image-container-inner img,
+  .testimonial-widget .image-container:not(.has-content) .image-container-inner video {
+    width: 100%;
+    height: 100%;
+  }
+
+  .testimonial-widget .blank-placeholder {
+    width: 44px;
+    height: 62px;
+  }
+}
+
+@media screen and (min-width: 769px) and (min-height: 600px) {
+  .testimonial-widget .images-row {
+    --stack-y: -60px;
+  }
+}
+
+@media screen and (min-width: 1200px) and (min-height: 800px) and (min-resolution: 2dppx) {
+  .testimonial-widget .images-row {
+    --stack-y: -140px;
+  }
+}
+
+@media screen and (min-width: 481px) {
+  .white-overlay .close-button {
+    top: calc(-0.84rem + var(--overlay-shift)) !important;
+  }
+}
+
+.white-overlay .rect-grid {
+  position: absolute;
+  top: calc(3.5rem + var(--overlay-shift));
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: calc(100% - (3.5rem + var(--overlay-shift)));
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  gap: 2rem;
+  padding: 2rem;
+  box-sizing: border-box;
+  overflow: visible;
+}
+
+.white-overlay .rect {
+  background: black;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+  transition: transform 600ms ease, opacity 240ms ease;
+  transform-origin: top center;
+  will-change: transform, opacity;
+}
+
+@media screen and (max-width: 480px) {
+  .white-overlay .rect-grid {
+    gap: 1rem;
+    padding: 1rem;
+  }
+}
+
+@media screen and (min-width: 481px) {
+  .white-overlay .close-button {
+    right: -0.8rem !important;
+  }
+}
+
+@media screen and (max-width: 480px) and (orientation: portrait) {
+  .white-overlay .rect-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    grid-template-rows: repeat(4, 1fr) !important;
+  }
+}
+
+.white-overlay.closing .rect {
+  opacity: 0;
+  transition: opacity 200ms ease;
+}
+
+.white-overlay.expanding .rect:not(.selected),
+.white-overlay.expanded .rect:not(.selected) {
+  transform: scale(0.6);
+  opacity: 0;
+}
+
+.white-overlay.expanded .rect-grid {
+  pointer-events: none;
+}
+
+.white-overlay.expanded .rect.selected {
+  position: relative;
+  z-index: 10002;
+}
+</style>
+</head>
+<body class="offset3" style="margin:0!important;padding:0!important;background:#0d1117!important;">
+
+<!-- Code Explanation Screen -->
+<div id="code-explanation">
+  <div id="code-lines"></div>
+  <div id="continue-prompt">
+    <span id="spacebar-text">press space bar to continue</span>
+  </div>
+</div>
+
+<div id="intro-ai-widget">
+  <div id="intro-ai-body">
+    <div id="intro-ai-messages"></div>
+    <div id="intro-ai-input-row">
+      <input id="intro-ai-input" type="text" placeholder="Type your name..." />
+      <button id="intro-ai-send" type="button">Send</button>
+    </div>
+  </div>
+</div>
+
+<div class="intro-video-container" id="introVideoContainer">
+  <div class="video-wrapper">
+    <video
+      id="introVideo"
+      muted
+      playsinline
+      webkit-playsinline
+      preload="auto"
+      style="object-fit: contain;"
+      disablepictureinpicture
+    >
+      <source
+        src="https://static1.squarespace.com/static/6697ea45b869d6401e6ec31a/t/692a4c1a4728d3103b396001/1764379688023/IMG_0323%281%29.mp4"
+        type="video/mp4"
+      />
+    </video>
+  </div>
+</div>
+
+<div id="vibe-chat-widget">
+  <div id="vibe-chat-body">
+    <div id="vibe-chat-message">
+      <span class="chat-label">Kate</span>
+      <span id="vibe-chat-text"></span>
+    </div>
+    <button id="vibeTriggerButton" class="video-arrow-btn arrow-up-btn" type="button" disabled aria-disabled="true">↑</button>
+  </div>
+</div>
+
+<div id="mood-slider-container">
+  <div id="mood-slider-wrapper">
+    <div id="mood-controls">
+      <div id="mood-labels">
+        <span class="mood-label" data-value="0">Original</span>
+        <span class="mood-label" data-value="33">Moody</span>
+        <span class="mood-label" data-value="66">Playful</span>
+        <span class="mood-label" data-value="100">Tipper</span>
+      </div>
+      <div id="mood-slider-track">
+        <div id="mood-slider-fill"></div>
+        <div id="mood-slider-thumb"></div>
+      </div>
+    </div>
+    <button id="strudelDoneButton" class="video-arrow-btn arrow-up-btn" type="button">↑</button>
+  </div>
+</div>
+
+<div class="main-content" id="mainContent">
+  <div class="white-overlay" id="whiteOverlay">
+    <div class="overlay-title" id="overlayTitle">INDEX</div>
+    <button class="close-button" id="closeButton" aria-label="Close overlay">&times;</button>
+    <div class="rect-grid" aria-hidden="true" id="rectGrid">
+      <div class="rect"></div>
+      <div class="rect"></div>
+      <div class="rect"></div>
+      <div class="rect"></div>
+      <div class="rect"></div>
+      <div class="rect"></div>
+      <div class="rect"></div>
+      <div class="rect"></div>
+    </div>
+  </div>
+
+  <div class="container" id="mainContainer">
+    <div class="static-text">
+      <div>Kate LaViolette</div>
+      <div>Copywriter &</div>
+      <div>Communication Strategist</div>
+    </div>
+    <div class="message-container">
+      <div class="message">Is having a weird day.</div>
+      <div class="message">Often considers changing this page.</div>
+      <div class="message">Is 87% charged.</div>
+      <div class="message">Wants a matcha latté.</div>
+      <div class="message">Probably won't change this page.</div>
+      <div class="message">Is closed on the weekend.</div>
+      <div class="message">Loves Porsche ads.</div>
+      <div class="message">Is day dreaming about their next client.</div>
+    </div>
+  </div>
+
+  <div class="full-bleed-wrapper" id="fullBleedWrapper">
+    <div class="testimonial-widget" id="testimonialWidget">
+      <div class="testimonial-container">
+        <div class="images-row">
+          <!-- Position 1 -->
+          <div class="image-container">
+            <div class="image-container-inner">
+              <img
+                src="https://static1.squarespace.com/static/6697ea45b869d6401e6ec31a/t/692bf4ef637b0319a86143a7/1764488436674/Beige+Monochrome+Minimalist+Our+Team+Introduction+Instagram+Post.png"
+                alt="Wheel image 1"
+              />
+            </div>
+          </div>
+          <!-- Position 2 -->
+          <div class="image-container">
+            <div class="image-container-inner">
+              <video
+                src="https://static1.squarespace.com/static/6697ea45b869d6401e6ec31a/t/692bf50d4728d3103b626c30/1764488464380/FullSizeRender+2.MP4"
+                autoplay
+                muted
+                loop
+                playsinline
+                webkit-playsinline
+                x5-playsinline
+                preload="auto"
+              ></video>
+            </div>
+          </div>
+          <!-- Position 3: First testimonial -->
+          <div class="image-container has-content">
+            <div class="image-container-inner">
+              <img
+                src="https://static1.squarespace.com/static/6697ea45b869d6401e6ec31a/t/67ec581b91b9cb1584b4f60c/1743542312830/Eliza+doesn%E2%80%99t+%2810%29.jpg"
+                alt="First testimonial"
+              />
+            </div>
+          </div>
+          <!-- Position 4 -->
+          <div class="image-container">
+            <div class="image-container-inner">
+              <img
+                src="https://static1.squarespace.com/static/6697ea45b869d6401e6ec31a/t/692bf521c568261bdb2fd4a8/1764488481686/IMG_0337.JPG"
+                alt="Wheel image 3"
+              />
+            </div>
+          </div>
+          <!-- Position 5 -->
+          <div class="image-container">
+            <div class="image-container-inner">
+              <img
+                src="https://static1.squarespace.com/static/6697ea45b869d6401e6ec31a/t/692bf5210dad5d330c97f17d/1764488481755/IMG_0339.JPG"
+                alt="Wheel image 5"
+              />
+            </div>
+          </div>
+          <!-- Position 6: Second testimonial -->
+          <div class="image-container has-content">
+            <div class="image-container-inner">
+              <img
+                src="https://static1.squarespace.com/static/6697ea45b869d6401e6ec31a/t/68755991747c220136966211/1752521107207/Eliza+doesn%E2%80%99t+%281215+x+2240+px%29+%283%29.jpg"
+                alt="Second testimonial"
+              />
+            </div>
+          </div>
+          <!-- Position 7 -->
+          <div class="image-container">
+            <div class="image-container-inner">
+              <video
+                src="https://static1.squarespace.com/static/6697ea45b869d6401e6ec31a/t/692bf521704a776c86589e1f/1764488488605/IMG_0340.MP4"
+                autoplay
+                muted
+                loop
+                playsinline
+                webkit-playsinline
+                x5-playsinline
+                preload="auto"
+              ></video>
+            </div>
+          </div>
+          <!-- Position 8 -->
+          <div class="image-container">
+            <div class="image-container-inner">
+              <img
+                src="https://static1.squarespace.com/static/6697ea45b869d6401e6ec31a/t/692bf616f08ee32b35e57fea/1764488730334/IMG_0347.JPG"
+                alt="Wheel image 8"
+              />
+            </div>
+          </div>
+          <!-- Position 9: Third testimonial -->
+          <div class="image-container has-content">
+            <div class="image-container-inner">
+              <img
+                src="https://static1.squarespace.com/static/6697ea45b869d6401e6ec31a/t/68754dc862047c5e14d0d40f/1752518090118/Eliza+doesn%E2%80%99t+%281515+x+2240+px%29+%281%29+copy.jpg"
+                alt="Third testimonial"
+              />
+            </div>
+          </div>
+          <!-- Position 10 -->
+          <div class="image-container">
+            <div class="image-container-inner">
+              <img
+                src="https://static1.squarespace.com/static/6697ea45b869d6401e6ec31a/t/692dd46e117b9249d0ef7348/1764611182717/IMG_0611.JPG"
+                alt="Additional image 1"
+              />
+            </div>
+          </div>
+          <!-- Position 11 -->
+          <div class="image-container">
+            <div class="image-container-inner">
+              <img
+                src="https://static1.squarespace.com/static/6697ea45b869d6401e6ec31a/t/692dd46e3d2e275e72827ca7/1764611182641/IMG_0609.JPG"
+                alt="Additional image 2"
+              />
+            </div>
+          </div>
+          <!-- Position 12: Fourth testimonial -->
+          <div class="image-container has-content">
+            <div class="image-container-inner">
+              <img
+                src="https://static1.squarespace.com/static/6697ea45b869d6401e6ec31a/t/68b492fc27f00b2da8392ba1/1756664582843/Eliza+doesn%E2%80%99t+%281215+x+2240+px%29+%281411+x+1957+px%29.jpg"
+                alt="Fourth testimonial"
+              />
+            </div>
+          </div>
+          <!-- Position 13 -->
+          <div class="image-container">
+            <div class="image-container-inner">
+              <img
+                src="https://static1.squarespace.com/static/6697ea45b869d6401e6ec31a/t/692dd46e86a0834aa7377937/1764611182631/IMG_0608.JPG"
+                alt="Additional image 3"
+              />
+            </div>
+          </div>
+          <!-- Position 14 -->
+          <div class="image-container">
+            <div class="image-container-inner">
+              <img
+                src="https://static1.squarespace.com/static/6697ea45b869d6401e6ec31a/t/692dd480f539d35a99879e34/1764611200615/IMG_0612.JPG"
+                alt="Additional image 4"
+              />
+            </div>
+          </div>
+          <!-- Position 15: Fifth testimonial -->
+          <div class="image-container has-content">
+            <div class="image-container-inner">
+              <img
+                src="https://static1.squarespace.com/static/6697ea45b869d6401e6ec31a/t/68b4d2b7fa10c471b617f8bb/1756680889097/Eliza+doesn%E2%80%99t+%281215+x+2240+px%29+%281411+x+1957+px%29+%281%29.jpg"
+                alt="Fifth testimonial"
+              />
+            </div>
+          </div>
+          <!-- Position 16 -->
+          <div class="image-container">
+            <div class="image-container-inner">
+              <img
+                src="https://static1.squarespace.com/static/6697ea45b869d6401e6ec31a/t/692dd4800efe383bc1245c02/1764611200510/IMG_0614.JPG"
+                alt="Additional image 5"
+              />
+            </div>
+          </div>
+          <!-- Position 17 -->
+          <div class="image-container">
+            <div class="image-container-inner">
+              <img
+                src="https://static1.squarespace.com/static/6697ea45b869d6401e6ec31a/t/692dd480ed09964934da13d9/1764611200395/IMG_0615.JPG"
+                alt="Additional image 6"
+              />
+            </div>
+          </div>
+          <!-- Position 18: Sixth testimonial -->
+          <div class="image-container has-content">
+            <div class="image-container-inner">
+              <img
+                src="https://static1.squarespace.com/static/6697ea45b869d6401e6ec31a/t/68755fdf9cd3b60f574d25f4/1752522722840/Eliza+doesn%E2%80%99t+%281215+x+2240+px%29+%284%29.jpg"
+                alt="Sixth testimonial"
+              />
+            </div>
+          </div>
+          <!-- Position 19: Seventh testimonial (video) -->
+          <div class="image-container has-content">
+            <div class="image-container-inner">
+              <video
+                id="seventhVideo"
+                src="https://static1.squarespace.com/static/6697ea45b869d6401e6ec31a/t/68b4ecd10bf8a00545992e45/1756687572997/Eliza+doesn%E2%80%99t+%281215+x+2240+px%29+%281411+x+1957+px%29+%282%29.mp4"
+                autoplay
+                muted
+                playsinline
+                webkit-playsinline
+                x5-playsinline
+                loop
+                preload="auto"
+              ></video>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div id="strudelContainer">
+  <iframe
+    id="strudelFrame"
+    allow="autoplay"
+  ></iframe>
+</div>
+
+<div id="wheelIntroMessage">
+  <div class="chat-bubble">
+    <div class="chat-message">
+      <span class="chat-label">Kate</span>
+      <span id="wheelIntroText"></span>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============ ANTI-COPY PROTECTION ============
+document.addEventListener('contextmenu', e => e.preventDefault());
+document.addEventListener('copy', e => e.preventDefault());
+document.addEventListener('cut', e => e.preventDefault());
+document.addEventListener('selectstart', e => {
+  if (e.target.id !== 'intro-ai-input') e.preventDefault();
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'PrintScreen' || 
+      (e.ctrlKey && e.key === 'p') || 
+      (e.ctrlKey && e.key === 'P') ||
+      (e.ctrlKey && e.key === 's') ||
+      (e.ctrlKey && e.key === 'S') ||
+      (e.ctrlKey && e.shiftKey && e.key === 'I') ||
+      (e.key === 'F12')) {
+    e.preventDefault();
+  }
+});
+
+// ============ GLOBAL CLICK BLOCKER FOR VIDEO AREA ============
+// This blocks ALL clicks except on the specific arrow button when conditions are met
+document.addEventListener('click', function(e) {
+  // Allow clicks on the intro AI input and send button
+  if (e.target.id === 'intro-ai-input' || e.target.id === 'intro-ai-send') {
+    return;
+  }
+  
+  // Check if clicking anywhere near the intro video container
+  const introVideoContainer = document.getElementById('introVideoContainer');
+  if (introVideoContainer && introVideoContainer.contains(e.target)) {
+    console.log("BLOCKED: Click on intro video container");
+    e.preventDefault();
+    e.stopPropagation();
+    e.stopImmediatePropagation();
+    return false;
+  }
+  
+  // Check if clicking anywhere in the vibe chat widget EXCEPT the button
+  const vibeChatWidget = document.getElementById('vibe-chat-widget');
+  const vibeTriggerBtn = document.getElementById('vibeTriggerButton');
+  if (vibeChatWidget && vibeChatWidget.contains(e.target) && e.target !== vibeTriggerBtn) {
+    console.log("BLOCKED: Click on vibe chat widget (not button)");
+    e.preventDefault();
+    e.stopPropagation();
+    e.stopImmediatePropagation();
+    return false;
+  }
+}, true); // Capture phase to block before bubbling
+
+// Also block mousedown and touchstart for extra protection
+['mousedown', 'touchstart'].forEach(function(eventType) {
+  document.addEventListener(eventType, function(e) {
+    // Allow on intro AI input and send button
+    if (e.target.id === 'intro-ai-input' || e.target.id === 'intro-ai-send') {
+      return;
+    }
+    
+    const introVideoContainer = document.getElementById('introVideoContainer');
+    if (introVideoContainer && introVideoContainer.contains(e.target)) {
+      e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
+      return false;
+    }
+    
+    const vibeChatWidget = document.getElementById('vibe-chat-widget');
+    const vibeTriggerBtn = document.getElementById('vibeTriggerButton');
+    if (vibeChatWidget && vibeChatWidget.contains(e.target) && e.target !== vibeTriggerBtn) {
+      e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
+      return false;
+    }
+  }, true);
+});
+
+// ============ GLOBAL TYPING FUNCTION ============
+function typeTextGlobal(element, fullText, speed, onComplete) {
+  let index = 0;
+  function step() {
+    if (!element) return;
+    if (index <= fullText.length) {
+      element.textContent = fullText.slice(0, index);
+      index++;
+      setTimeout(step, speed);
+    } else if (typeof onComplete === "function") {
+      onComplete();
+    }
+  }
+  step();
+}
+
+// ============ CODE TYPING EXPLANATION ============
+const codeLines = [
+  { type: 'comment', text: '// ADAPTIVE PORTFOLIO — Work in Progress' },
+  { type: 'comment', text: '// An experiment in human-centered AI interaction' },
+  { type: 'blank', text: '' },
+  { type: 'comment', text: '/*' },
+  { type: 'comment', text: ' * This portfolio detects your unique behavioral signature' },
+  { type: 'comment', text: ' * through how you interact — not what you click.' },
+  { type: 'comment', text: ' */' },
+  { type: 'blank', text: '' },
+  { type: 'code', text: '<span class="keyword">const</span> <span class="variable">behavioralFingerprint</span> = {' },
+  { type: 'code', text: '  <span class="string">velocityIntegral</span>:     <span class="comment">// How fast you move</span>' },
+  { type: 'code', text: '  <span class="string">directionChanges</span>:     <span class="comment">// How often you reverse</span>' },
+  { type: 'code', text: '  <span class="string">oscillationFrequency</span>: <span class="comment">// Jitter and hesitation</span>' },
+  { type: 'code', text: '  <span class="string">dwellEntropy</span>:         <span class="comment">// Range of exploration</span>' },
+  { type: 'code', text: '  <span class="string">rhythmScore</span>:          <span class="comment">// Timing regularity</span>' },
+  { type: 'code', text: '};' },
+  { type: 'blank', text: '' },
+  { type: 'comment', text: '// These metrics pass through a VAE-architecture forward pass' },
+  { type: 'comment', text: '// encoding your interaction into a 6D latent space' },
+  { type: 'blank', text: '' },
+  { type: 'code', text: '<span class="keyword">function</span> <span class="function">classifyUserVibe</span>(<span class="variable">fingerprint</span>) {' },
+  { type: 'code', text: '  <span class="keyword">const</span> <span class="variable">encoded</span> = <span class="function">vaeEncode</span>(fingerprint);' },
+  { type: 'code', text: '  <span class="keyword">const</span> <span class="variable">archetype</span> = <span class="function">findNearestCluster</span>(encoded.<span class="variable">mu</span>);' },
+  { type: 'code', text: '  <span class="keyword">return</span> archetype; <span class="comment">// Nervous | Contemplative | Exploratory | Decisive</span>' },
+  { type: 'code', text: '}' },
+  { type: 'blank', text: '' },
+  { type: 'comment', text: '// Your behavioral data generates unique outputs:' },
+  { type: 'code', text: '<span class="function">generateUniqueFlower</span>(encoded.<span class="variable">latentVector</span>);  <span class="comment">// 3D flower from your vibe</span>' },
+  { type: 'code', text: '<span class="function">modulateAudio</span>(fingerprint);              <span class="comment">// Music responds to movement</span>' },
+  { type: 'blank', text: '' },
+  { type: 'comment', text: '// The background: custom-built live-coding environment' },
+  { type: 'comment', text: '// with hand-written Strudel code generating reactive audio.' },
+  { type: 'blank', text: '' },
+  { type: 'comment', text: '/*' },
+  { type: 'comment', text: ' * THE VISION: Once your vibe is detected, the entire' },
+  { type: 'comment', text: ' * portfolio experience adapts — pacing, tone, content' },
+  { type: 'comment', text: ' * selection, and an AI chatbot tuned to your style.' },
+  { type: 'comment', text: ' *' },
+  { type: 'comment', text: ' * Nervous users get calmer, slower reveals.' },
+  { type: 'comment', text: ' * Decisive users get direct, efficient navigation.' },
+  { type: 'comment', text: ' * Exploratory users discover hidden paths.' },
+  { type: 'comment', text: ' */' },
+  { type: 'blank', text: '' },
+  { type: 'code', text: '<span class="keyword">const</span> <span class="variable">status</span> = <span class="string">"under construction"</span>;' },
+  { type: 'comment', text: '// Real-time behavioral analysis, flower, and audio: functional.' },
+  { type: 'comment', text: '// Adaptive UI and personalized chatbot: coming soon.' },
+  { type: 'blank', text: '' },
+  { type: 'code', text: '<span class="function">enterPortfolio</span>();' },
+];
+
+let currentLineIndex = 0;
+let codeExplanationComplete = false;
+const codeLinesContainer = document.getElementById('code-lines');
+const continuePrompt = document.getElementById('continue-prompt');
+const continueBtn = document.getElementById('continue-btn');
+const codeExplanation = document.getElementById('code-explanation');
+
+function createCodeLine(lineNum, content, type) {
+  const line = document.createElement('div');
+  line.className = 'code-line';
+  
+  const numSpan = document.createElement('span');
+  numSpan.className = 'line-number';
+  numSpan.textContent = lineNum;
+  
+  const contentSpan = document.createElement('span');
+  contentSpan.className = 'line-content';
+  
+  if (type === 'comment') {
+    contentSpan.innerHTML = '<span class="comment">' + content + '</span>';
+  } else if (type === 'blank') {
+    contentSpan.innerHTML = '&nbsp;';
+  } else {
+    contentSpan.innerHTML = content;
+  }
+  
+  line.appendChild(numSpan);
+  line.appendChild(contentSpan);
+  
+  return line;
+}
+
+function typeNextLine() {
+  if (currentLineIndex >= codeLines.length) {
+    // All lines typed, show continue prompt
+    setTimeout(() => {
+      continuePrompt.classList.add('visible');
+      codeExplanationComplete = true;
+      spacebarEnabled = true;
+    }, 500);
+    return;
+  }
+  
+  const lineData = codeLines[currentLineIndex];
+  const lineElement = createCodeLine(currentLineIndex + 1, lineData.text, lineData.type);
+  codeLinesContainer.appendChild(lineElement);
+  
+  // Trigger animation
+  setTimeout(() => {
+    lineElement.classList.add('visible');
+  }, 50);
+  
+  // Auto-scroll to bottom
+  codeLinesContainer.scrollTop = codeLinesContainer.scrollHeight;
+  
+  currentLineIndex++;
+  
+  // Determine delay for next line
+  let delay;
+  if (lineData.type === 'blank') {
+    delay = 150;
+  } else if (lineData.type === 'comment') {
+    delay = 80 + lineData.text.length * 8;
+  } else {
+    delay = 100 + lineData.text.length * 6;
+  }
+  
+  setTimeout(typeNextLine, delay);
+}
+
+// Start typing after a brief delay
+setTimeout(typeNextLine, 800);
+
+// Spacebar handler for continuing
+let spacebarEnabled = false;
+
+document.addEventListener('keydown', (e) => {
+  // Allow skipping with any key press after first few lines (except spacebar)
+  if (currentLineIndex > 5 && currentLineIndex < codeLines.length && e.key !== ' ') {
+    // Speed up - show all remaining lines
+    while (currentLineIndex < codeLines.length) {
+      const lineData = codeLines[currentLineIndex];
+      const lineElement = createCodeLine(currentLineIndex + 1, lineData.text, lineData.type);
+      codeLinesContainer.appendChild(lineElement);
+      lineElement.classList.add('visible');
+      currentLineIndex++;
+    }
+    // Scroll to bottom
+    codeLinesContainer.scrollTop = codeLinesContainer.scrollHeight;
+    continuePrompt.classList.add('visible');
+    codeExplanationComplete = true;
+    spacebarEnabled = true;
+  }
+  
+  // Spacebar to continue after intro is complete
+  if (e.key === ' ' && spacebarEnabled && codeExplanationComplete) {
+    e.preventDefault();
+    spacebarEnabled = false; // Prevent double-trigger
+    
+    // Switch to white background immediately
+    document.documentElement.style.cssText = 'margin:0!important;padding:0!important;background:white!important;';
+    document.body.style.cssText = 'margin:0!important;padding:0!important;background:white!important;min-height:100vh;overflow:hidden;';
+    document.body.classList.add('show-white-bg');
+    
+    codeExplanation.classList.add('fade-out');
+    setTimeout(() => {
+      codeExplanation.style.display = 'none';
+      // Start the original AI chat sequence
+      startAIChatSequence();
+    }, 1500);
+  }
+});
+
+// ============ ORIGINAL AI CHAT SEQUENCE ============
+function startAIChatSequence() {
+  const introWidget = document.getElementById("intro-ai-widget");
+  const messagesEl = document.getElementById("intro-ai-messages");
+  const inputEl = document.getElementById("intro-ai-input");
+  const sendBtn = document.getElementById("intro-ai-send");
+  const inputRow = document.getElementById("intro-ai-input-row");
+  const introVideoContainer = document.getElementById("introVideoContainer");
+  const introVideo = document.getElementById("introVideo");
+
+  const STORAGE_KEY = "intro_user_name";
+  let nameGiven = false;
+  let currentUserMessage = null;
+  let initialAiMessage = null;
+
+  const profanityList = [
+    "fuck", "shit", "bitch", "ass", "damn", "hell", "crap", "piss", "dick", "cock",
+    "pussy", "bastard", "slut", "whore", "fag", "dyke", "retard", "nigger", "nigga",
+    "cunt", "twat", "motherfucker", "asshole", "bullshit", "goddamn", "jesus christ",
+    "fck", "sht", "btch", "fuk", "fuq", "phuck", "shyt", "azz", "biatch", "beotch",
+    "dumbass", "jackass", "dipshit", "poop", "pee", "poo", "peeing", "pooping",
+    "fart", "farting", "farts", "farted", "burp", "burping", "burps", "burped",
+    "vomit", "vomiting", "puke", "puking", "barf", "barfing", "diarrhea", "diarrhoea",
+    "constipation", "excrement", "defecate", "urinate", "urine", "feces", "turd",
+    "turds", "booger", "boogers", "snot", "snotty", "mucus", "phlegm", "spit",
+    "spitting", "drool", "drooling", "pus", "discharge", "sweat", "sweating",
+    "stink", "stinks", "stinky", "smelly", "smells", "reek", "reeking", "stench",
+    "dookie", "doodoo", "poopoo", "peepee", "caca", "kaka", "number two", "number 2",
+    "dump", "dumps", "doo", "dung", "gross", "disgusting", "nasty", "yucky", "icky",
+    "slime", "slimy", "goo", "gooey", "crud", "gunk", "grime", "grimy", "filth",
+    "filthy", "muck", "scum", "ooze", "oozing", "bile", "slobber", "slobbering",
+    "sputum", "earwax", "toe jam", "smegma", "mierda", "puta", "puto", "joder",
+    "carajo", "pendejo", "verga", "chingar", "merde", "putain", "con", "connard",
+    "salope", "bordel", "chier", "bite", "couille", "arsch", "fotze", "hurensohn",
+    "fick", "ficken", "schlampe", "verdammt", "merda", "cazzo", "puttana",
+    "vaffanculo", "stronzo", "bastardo", "figa", "coglione", "spic", "chink",
+    "gook", "kike", "wetback", "beaner", "raghead", "towelhead", "cracker",
+    "honkey", "whitey", "negro", "jap", "paki", "wop", "dago", "polack"
+  ];
+  
+  const notNames = [
+    "hi", "hey", "hello", "yo", "sup", "howdy", "greetings", "hola", "aloha",
+    "good", "morning", "afternoon", "evening", "night", "whats", "what", "up",
+    "how", "are", "you", "doing", "going", "fine", "great", "ok", "okay",
+    "alright", "thanks", "thank", "thx", "please", "yes", "no", "yeah", "nah",
+    "yep", "nope", "yup", "the", "a", "an", "my", "is", "am", "me", "i", "im",
+    "id", "idk", "dunno", "dont", "know", "sure", "maybe", "why", "nothing",
+    "something", "anything", "everything", "test", "testing", "asdf", "qwerty",
+    "lol", "lmao", "haha", "uh", "um", "er", "well", "like", "just", "really"
+  ];
+
+  function getSavedName() {
+    try { return localStorage.getItem(STORAGE_KEY); } catch (e) { return null; }
+  }
+  
+  function saveName(name) {
+    try { localStorage.setItem(STORAGE_KEY, name); } catch (e) {}
+  }
+
+  function typeText(element, fullText, speed, onComplete) {
+    let index = 0;
+    function step() {
+      if (!element) return;
+      if (index <= fullText.length) {
+        element.textContent = fullText.slice(0, index);
+        index++;
+        setTimeout(step, speed);
+      } else if (typeof onComplete === "function") {
+        onComplete();
+      }
+    }
+    step();
+  }
+
+  function appendMessage(role, text) {
+    const isAI = role === "assistant" || role === "ai";
+    const wrapper = document.createElement("div");
+    wrapper.className = isAI ? "intro-ai-message" : "intro-user-message";
+    const label = document.createElement("span");
+    label.className = isAI ? "intro-ai-label" : "intro-user-label";
+    label.textContent = isAI ? "Kate" : "You";
+    const content = document.createElement("span");
+    content.textContent = text;
+    wrapper.appendChild(label);
+    wrapper.appendChild(content);
+    messagesEl.appendChild(wrapper);
+    return { wrapper, content };
+  }
+
+  function showTypingIndicator() {
+    const { wrapper, content } = appendMessage("assistant", ".");
+    wrapper.classList.add("intro-typing-indicator");
+    let dots = 1;
+    const intervalId = setInterval(() => {
+      dots = (dots % 3) + 1;
+      content.textContent = ".".repeat(dots);
+    }, 700);
+    wrapper._typingIntervalId = intervalId;
+    return wrapper;
+  }
+
+  function removeTypingIndicator(el) {
+    if (el) {
+      if (el._typingIntervalId) clearInterval(el._typingIntervalId);
+      if (el.parentNode) el.parentNode.removeChild(el);
+    }
+  }
+
+  function containsProfanity(text) {
+    const cleaned = text.toLowerCase().replace(/[^a-z0-9\s]/g, "").replace(/\s+/g, " ").trim();
+    const words = cleaned.split(" ");
+    for (const word of words) {
+      if (profanityList.includes(word)) return true;
+    }
+    for (const profanity of profanityList) {
+      if (cleaned.includes(profanity)) return true;
+    }
+    return false;
+  }
+
+  function isValidName(text) {
+    if (containsProfanity(text)) return false;
+    const cleaned = text.trim().replace(/[.!?,;]+$/g, "").toLowerCase();
+    if (cleaned.length < 2) return false;
+    if (notNames.includes(cleaned)) return false;
+    if (!/^[a-z]+(?:[\s-][a-z]+)*$/i.test(cleaned)) return false;
+    const words = cleaned.split(/[\s-]+/);
+    if (words.length > 1) {
+      const allCommon = words.every((word) => notNames.includes(word));
+      if (allCommon) return false;
+    }
+    const badPatterns = [/^(hi+|hey+|hello+|yo+)/i, /^(idk|dunno|lol|lmao)/i, /what|how|why|when|where/i];
+    for (const pattern of badPatterns) {
+      if (pattern.test(cleaned)) return false;
+    }
+    return true;
+  }
+
+  function extractName(text) {
+    const cleaned = text.trim().replace(/[.!?,;]+$/g, "");
+    const patterns = [
+      /(?:i'?m|i am|my name is|this is|call me|name'?s)\s+([a-z]+(?:[\s-][a-z]+)*)/i,
+      /(?:hi|hey|hello),?\s+(?:i'?m|i am)\s+([a-z]+(?:[\s-][a-z]+)*)/i,
+      /^([a-z]+(?:[\s-][a-z]+)*)$/i
+    ];
+    for (const pattern of patterns) {
+      const match = cleaned.match(pattern);
+      if (match && match[1]) {
+        const potentialName = match[1].trim();
+        if (isValidName(potentialName)) {
+          return potentialName.split(/[\s-]+/).map(
+            (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+          ).join(" ");
+        }
+      }
+    }
+    return null;
+  }
+
+  function fadeOutUserMessage(messageWrapper, callback) {
+    messageWrapper.classList.add("fade-out-message");
+    setTimeout(() => {
+      if (messageWrapper && messageWrapper.parentNode)
+        messageWrapper.parentNode.removeChild(messageWrapper);
+      if (callback) callback();
+    }, 400);
+  }
+
+  function retypeIntroMessage(callback) {
+    if (initialAiMessage) {
+      const contentSpan = initialAiMessage.querySelector("span:last-child");
+      if (contentSpan) {
+        contentSpan.textContent = "";
+        typeText(contentSpan, "Hi! I'm Kate. Welcome to my portfolio. What's your name?", 30, callback);
+      }
+    }
+  }
+
+  function proceedToVideo() {
+    nameGiven = true;
+    chatCompleted = true;
+    
+    // Switch to white background for video phase
+    document.documentElement.style.cssText = 'margin:0!important;padding:0!important;background:white!important;';
+    document.body.style.cssText = 'margin:2rem!important;padding:0!important;background:white!important;min-height:100vh;overflow:hidden;';
+    document.body.classList.add('show-white-bg');
+    
+    setTimeout(() => {
+      introWidget.classList.remove("fade-in");
+      introWidget.classList.add("fade-out");
+      introVideoContainer.classList.add("visible");
+      const playPromise = introVideo.play();
+      if (playPromise !== undefined) playPromise.catch(() => {});
+      setTimeout(() => {
+        if (introWidget && introWidget.parentNode)
+          introWidget.parentNode.removeChild(introWidget);
+      }, 1500);
+    }, 500);
+  }
+
+  function startReturningUserSequence(savedName) {
+    inputRow.style.display = "none";
+    messagesEl.classList.remove("compact");
+    setTimeout(() => {
+      introWidget.classList.add("fade-in");
+    }, 300);
+    setTimeout(() => {
+      const introMsg = appendMessage("assistant", "");
+      initialAiMessage = introMsg.wrapper;
+      typeText(introMsg.content, "Welcome back, " + savedName + ".", 30, () => {
+        setTimeout(() => {
+          proceedToVideo();
+        }, 800);
+      });
+    }, 1800);
+  }
+
+  function startNewUserSequence() {
+    setTimeout(() => {
+      introWidget.classList.add("fade-in");
+    }, 300);
+    setTimeout(() => {
+      inputEl.disabled = true;
+      sendBtn.disabled = true;
+      const introMsg = appendMessage("assistant", "");
+      initialAiMessage = introMsg.wrapper;
+      typeText(introMsg.content, "Hi! I'm Kate. Welcome to my portfolio. What's your name?", 30, () => {
+        inputEl.disabled = false;
+        sendBtn.disabled = false;
+        inputEl.focus();
+      });
+    }, 1800);
+  }
+
+  function handleSend() {
+    const text = inputEl.value.trim();
+    if (!text || nameGiven) return;
+    inputEl.value = "";
+    inputEl.disabled = true;
+    sendBtn.disabled = true;
+    const userMsg = appendMessage("user", text);
+    currentUserMessage = userMsg.wrapper;
+    const extractedName = extractName(text);
+    const typingEl = showTypingIndicator();
+    setTimeout(() => {
+      removeTypingIndicator(typingEl);
+      if (extractedName) {
+        saveName(extractedName);
+        const aiMsg = appendMessage("assistant", "");
+        const welcomeText = "Come on in, " + extractedName + ".";
+        typeText(aiMsg.content, welcomeText, 30, () => {
+          proceedToVideo();
+        });
+      } else {
+        fadeOutUserMessage(currentUserMessage, () => {
+          retypeIntroMessage(() => {
+            inputEl.disabled = false;
+            sendBtn.disabled = false;
+            inputEl.focus();
+          });
+        });
+      }
+    }, 1200);
+  }
+
+  sendBtn.addEventListener("click", handleSend);
+  inputEl.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") handleSend();
+  });
+
+  const savedName = getSavedName();
+  if (savedName) {
+    startReturningUserSequence(savedName);
+  } else {
+    startNewUserSequence();
+  }
+}
+
+let chatCompleted = false;
+let wheelStopped = false;
+let wheelShouldStopAfterSpotlight = false;
+let isLookingUpMode = false;
+let lookingUpTransitionInProgress = false;
+let wheelHasSlid = false;
+let strudelIsPlaying = false;
+let pageFrozen = false;
+
+let strudelOriginalSrc =
+  "https://katelaviolette1396.github.io/strudel-behavior2/vibe-experience-safari-fixed11244.html";
+
+function showStrudelVisual() {
+  const strudelContainer = document.getElementById("strudelContainer");
+  if (strudelContainer) {
+    strudelContainer.classList.add("visible");
+  }
+}
+
+function startStrudelAudio() {
+  const strudelFrame = document.getElementById("strudelFrame");
+  if (!strudelFrame) return;
+  
+  strudelIsPlaying = true;
+  
+  // If iframe src is blank or missing, reload it first
+  if (!strudelFrame.src || strudelFrame.src === "about:blank") {
+    strudelFrame.src = strudelOriginalSrc;
+    strudelFrame.onload = function() {
+      // Wait a moment for the iframe content to initialize, then send start message
+      setTimeout(() => {
+        if (strudelFrame.contentWindow) {
+          strudelFrame.contentWindow.postMessage("startStrudel", "*");
+          strudelFrame.contentWindow.postMessage({ type: "setMoodSlider", value: currentMoodValue }, "*");
+        }
+      }, 500);
+    };
+  } else {
+    // Iframe already has src, just send the start message
+    if (strudelFrame.contentWindow) {
+      strudelFrame.contentWindow.postMessage("startStrudel", "*");
+      strudelFrame.contentWindow.postMessage({ type: "setMoodSlider", value: currentMoodValue }, "*");
+    }
+  }
+}
+
+function pauseStrudelAudio() {
+  const strudelFrame = document.getElementById("strudelFrame");
+  if (strudelFrame && strudelFrame.contentWindow) {
+    strudelFrame.contentWindow.postMessage("pauseStrudel", "*");
+    strudelFrame.contentWindow.postMessage({ type: "pauseStrudel" }, "*");
+    strudelFrame.contentWindow.postMessage({ type: "pause" }, "*");
+    strudelFrame.contentWindow.postMessage("stop", "*");
+    strudelFrame.contentWindow.postMessage({ type: "stop" }, "*");
+    try {
+      if (
+        strudelFrame.contentWindow.document &&
+        strudelFrame.contentWindow.document.activeElement
+      ) {
+        strudelFrame.contentWindow.document.activeElement.blur();
+      }
+    } catch (e) {}
+    if (strudelFrame.src && strudelFrame.src !== "about:blank") {
+      strudelFrame.dataset.originalSrc = strudelFrame.src;
+      strudelFrame.src = "about:blank";
+    }
+  }
+  // Also pause intro video when strudel pauses
+  const introVideo = document.getElementById("introVideo");
+  if (introVideo) {
+    introVideo.pause();
+  }
+}
+
+function resumeStrudelAudio() {
+  const strudelFrame = document.getElementById("strudelFrame");
+  if (strudelFrame && strudelIsPlaying) {
+    if (strudelFrame.src === "about:blank" || !strudelFrame.src) {
+      strudelFrame.src = strudelOriginalSrc;
+      strudelFrame.onload = function () {
+        setTimeout(() => {
+          if (strudelFrame.contentWindow) {
+            strudelFrame.contentWindow.postMessage("startStrudel", "*");
+            strudelFrame.contentWindow.postMessage({ type: "setMoodSlider", value: currentMoodValue }, "*");
+          }
+        }, 500);
+      };
+    } else if (strudelFrame.contentWindow) {
+      strudelFrame.contentWindow.postMessage("startStrudel", "*");
+      strudelFrame.contentWindow.postMessage({ type: "setMoodSlider", value: currentMoodValue }, "*");
+    }
+  }
+}
+
+let strudelHasEnded = false;
+
+function handleStrudelEnded() {
+  if (strudelHasEnded) return;
+  strudelHasEnded = true;
+  
+  // Fade out strudel
+  const strudelContainer = document.getElementById("strudelContainer");
+  if (strudelContainer) {
+    strudelContainer.classList.remove("visible");
+  }
+  pauseStrudelAudio();
+  
+  // Hide the video container
+  const introVideoContainer = document.getElementById("introVideoContainer");
+  if (introVideoContainer) {
+    introVideoContainer.classList.remove("visible");
+  }
+  
+  // Hide the mood slider container
+  const moodSliderContainer = document.getElementById("mood-slider-container");
+  if (moodSliderContainer) {
+    moodSliderContainer.classList.remove("visible");
+  }
+  
+  // Hide vibe chat widget
+  const vibeChatWidget = document.getElementById("vibe-chat-widget");
+  if (vibeChatWidget) {
+    vibeChatWidget.classList.remove("visible");
+  }
+  
+  // Bring wheel back down after strudel fades
+  setTimeout(() => {
+    const testimonialWidget = document.getElementById("testimonialWidget");
+    const mainContainer = document.getElementById("mainContainer");
+    if (testimonialWidget) {
+      testimonialWidget.classList.remove("slide-up");
+      testimonialWidget.classList.add("returned");
+    }
+    if (mainContainer) {
+      mainContainer.classList.remove("slide-up-out");
+      mainContainer.classList.remove("fade-out-for-perspective");
+    }
+    
+    // Show info message after wheel comes down
+    setTimeout(() => {
+      // Trigger the AI chat widget to open with the post-strudel message
+      if (typeof openChatWithMessage === 'function') {
+        openChatWithMessage("Personalized portfolio coming soon. In the meantime, let me know what you'd like to see.");
+      }
+      
+      // Start wheel rotation - spotlight center card first, then rotate through all
+      wheelStopped = false;
+      wheelHasSlid = false;
+      if (!pageFrozen && wheelInitialized) {
+        clearNextRotation();
+        // Spotlight the front/center card first without rotating
+        nextRotationTimeout = setTimeout(() => {
+          if (wheelStopped || pageFrozen) return;
+          const frontIdx = findFrontCardIndex();
+          const frontCard = wheelCards[frontIdx];
+          if (frontCard) {
+            spotlightCard(frontCard, () => {
+              if (!wheelStopped && !pageFrozen)
+                nextRotationTimeout = setTimeout(rotateToNextContent, 100);
+            });
+          } else {
+            rotateToNextContent();
+          }
+        }, 800);
+      }
+    }, 2000);
+  }, 1500);
+}
+
+window.addEventListener("message", (event) => {
+  const data = event.data;
+  
+  // Listen for pause signals from strudel
+  if (data === "pause" || 
+      (data && typeof data === "object" && data.type === "pause")) {
+    const introVideo = document.getElementById("introVideo");
+    if (introVideo) {
+      introVideo.pause();
+    }
+  }
+  
+  // Listen for resume signals from strudel
+  if (data === "resume" || 
+      (data && typeof data === "object" && data.type === "resume")) {
+    const introVideo = document.getElementById("introVideo");
+    if (introVideo && strudelIsPlaying && !strudelHasEnded) {
+      introVideo.play().catch(() => {});
+    }
+  }
+  
+  // Listen for strudelEnded
+  if (data === "strudelEnded" || 
+      (data && typeof data === "object" && data.type === "strudelEnded")) {
+    handleStrudelEnded();
+  }
+});
+
+function slideWheelUpAndShowStrudel() {
+  if (wheelHasSlid) return;
+  wheelHasSlid = true;
+  wheelStopped = true;
+  clearNextRotation();
+  const testimonialWidget = document.getElementById("testimonialWidget");
+  const mainContainer = document.getElementById("mainContainer");
+  const videoArrowsContainer = document.getElementById("video-arrows-container");
+  mainContainer.classList.add("fade-out-for-perspective");
+  testimonialWidget.classList.add("slide-up");
+  if (videoArrowsContainer) {
+    videoArrowsContainer.classList.add("looking-up-position");
+  }
+  startStrudelAudio();
+}
+
+const introVideoContainer = document.getElementById("introVideoContainer");
+const introVideo = document.getElementById("introVideo");
+const mainContent = document.getElementById("mainContent");
+const moodSliderContainer = document.getElementById("mood-slider-container");
+
+let introComplete = false;
+let wheelInitialized = false;
+let wheelMovedAt24 = false;
+let elementsShownAt29 = false;
+let hasTriggeredSlideUp = false;
+let pendingDirection = null;
+let wheelIntroMessageShown = false;
+
+introVideo.addEventListener("timeupdate", () => {
+  if (!chatCompleted) return;
+  if (!wheelInitialized && introVideo.currentTime >= 9) {
+    wheelInitialized = true;
+    mainContent.classList.add("visible");
+    initializeWheel();
+    // Intro message will be shown later at 13 seconds
+  }
+  // Show the intro message at 13 seconds (after wheel has been running a bit)
+  if (!wheelIntroMessageShown && introVideo.currentTime >= 13) {
+    wheelIntroMessageShown = true;
+    const wheelIntroMessage = document.getElementById("wheelIntroMessage");
+    const wheelIntroText = document.getElementById("wheelIntroText");
+    if (wheelIntroMessage) {
+      wheelIntroMessage.classList.add("visible");
+      if (wheelIntroText) {
+        wheelIntroText.textContent = "";
+        // Wait for fade-in to complete (1.5s) then start typing
+        setTimeout(() => {
+          typeTextGlobal(wheelIntroText, "Let's personalize how you experience these projects.", 30);
+        }, 1800);
+      }
+    }
+  }
+  if (!wheelMovedAt24 && introVideo.currentTime >= 24) {
+    wheelMovedAt24 = true;
+    wheelStopped = true;
+    clearNextRotation();
+    const testimonialWidget = document.getElementById("testimonialWidget");
+    const mainContainer = document.getElementById("mainContainer");
+    mainContainer.classList.add("slide-up-out");
+    testimonialWidget.classList.add("slide-up");
+    // Hide the intro message
+    const wheelIntroMessage = document.getElementById("wheelIntroMessage");
+    if (wheelIntroMessage) {
+      wheelIntroMessage.classList.remove("visible");
+    }
+  }
+  if (!elementsShownAt29 && introVideo.currentTime >= 29.6) {
+    elementsShownAt29 = true;
+    introVideo.pause();
+    showVibeChatWidget();
+    // Strudel visual is now shown when the arrow button is pressed instead
+  }
+});
+
+let vibeSliderHasBeenMoved = false;
+
+function showVibeChatWidget() {
+  const vibeChatWidget = document.getElementById("vibe-chat-widget");
+  const vibeChatText = document.getElementById("vibe-chat-text");
+  const triggerBtn = document.getElementById("vibeTriggerButton");
+  
+  vibeChatWidget.classList.add("visible");
+  
+  // CRITICAL: Now and ONLY now allow button clicks
+  buttonClickAllowed = true;
+  console.log("buttonClickAllowed set to TRUE");
+  
+  // Enable the button element itself
+  if (triggerBtn) {
+    triggerBtn.disabled = false;
+    triggerBtn.removeAttribute("aria-disabled");
+    console.log("Button element ENABLED");
+  }
+  
+  if (vibeChatText) {
+    vibeChatText.textContent = "";
+    // Wait for fade-in to complete (1.5s) then start typing
+    setTimeout(() => {
+      typeTextGlobal(vibeChatText, "Click to get started.", 30);
+    }, 1800);
+  }
+}
+
+function triggerVibeStart() {
+  // CRITICAL GUARD: Only allow if we've reached the right point in the video
+  // and the vibe chat widget is actually visible
+  if (!elementsShownAt29) {
+    console.log("triggerVibeStart blocked: elementsShownAt29 is false");
+    return;
+  }
+  
+  const vibeChatWidget = document.getElementById("vibe-chat-widget");
+  if (!vibeChatWidget || !vibeChatWidget.classList.contains("visible")) {
+    console.log("triggerVibeStart blocked: widget not visible");
+    return;
+  }
+  
+  if (!buttonClickAllowed) {
+    console.log("triggerVibeStart blocked: buttonClickAllowed is false");
+    return;
+  }
+  
+  if (vibeSliderHasBeenMoved) return;
+  vibeSliderHasBeenMoved = true;
+  
+  // Disable further button clicks
+  buttonClickAllowed = false;
+  console.log("buttonClickAllowed set to FALSE");
+  
+  // Disable the button element
+  const triggerBtn = document.getElementById("vibeTriggerButton");
+  if (triggerBtn) {
+    triggerBtn.disabled = true;
+    triggerBtn.setAttribute("aria-disabled", "true");
+    console.log("Button element DISABLED");
+  }
+  
+  // Fade out the vibe chat widget
+  vibeChatWidget.classList.remove("visible");
+  
+  introVideoContainer.classList.add("video-grow-on-resume");
+  introVideo.play();
+  showStrudelVisual();
+  startStrudelAudio();
+  wheelStopped = true;
+  clearNextRotation();
+}
+
+const btnPlay = document.getElementById("btn-play");
+if (btnPlay) {
+  btnPlay.style.display = "none";
+}
+
+introVideo.addEventListener("ended", () => {
+  if (!chatCompleted) return;
+  introVideoContainer.classList.remove("visible");
+  if (introComplete) return;
+  introComplete = true;
+  introVideoContainer.style.background = "transparent";
+  if (!wheelInitialized) {
+    wheelInitialized = true;
+    mainContent.classList.add("visible");
+    initializeWheel();
+    // Show the intro message after a delay
+    setTimeout(() => {
+      const wheelIntroMessage = document.getElementById("wheelIntroMessage");
+      const wheelIntroText = document.getElementById("wheelIntroText");
+      if (wheelIntroMessage) {
+        wheelIntroMessage.classList.add("visible");
+        if (wheelIntroText) {
+          wheelIntroText.textContent = "";
+          // Wait for fade-in to complete (1.5s) then start typing
+          setTimeout(() => {
+            typeTextGlobal(wheelIntroText, "Let's personalize how you experience these projects.", 30);
+          }, 1800);
+        }
+      }
+    }, 4000);
+  }
+});
+
+setTimeout(() => {
+  if (!chatCompleted) return;
+  if (!wheelInitialized && introVideo.readyState < 2) {
+    wheelInitialized = true;
+    introComplete = true;
+    introVideoContainer.style.background = "transparent";
+    mainContent.classList.add("visible");
+    initializeWheel();
+    // Show the intro message after a delay
+    setTimeout(() => {
+      const wheelIntroMessage = document.getElementById("wheelIntroMessage");
+      const wheelIntroText = document.getElementById("wheelIntroText");
+      if (wheelIntroMessage) {
+        wheelIntroMessage.classList.add("visible");
+        if (wheelIntroText) {
+          wheelIntroText.textContent = "";
+          // Wait for fade-in to complete (1.5s) then start typing
+          setTimeout(() => {
+            typeTextGlobal(wheelIntroText, "Let's personalize how you experience these projects.", 30);
+          }, 1800);
+        }
+      }
+    }, 4000);
+  }
+}, 20000);
+
+const whiteOverlay = document.getElementById("whiteOverlay");
+const closeButton = document.getElementById("closeButton");
+const overlayTitle = document.getElementById("overlayTitle");
+const rectGrid = document.getElementById("rectGrid");
+const OVERLAY_FADE_MS = 1600;
+const X_APPEAR_DELAY_MS = 600;
+let xRevealTimer = null;
+
+function clearXTimer() {
+  if (xRevealTimer) {
+    clearTimeout(xRevealTimer);
+    xRevealTimer = null;
+  }
+}
+function spinOnce(el) {
+  if (!el) return;
+  el.classList.add("spin");
+  setTimeout(() => el.classList.remove("spin"), 360);
+}
+function arrowUpSVG() {
+  return '<svg aria-hidden="true" width="1em" height="1em" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg"><g fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 28 V16"></path><path d="M8 24 L20 12 L32 24"></path></g></svg>';
+}
+function syncCloseButtonY() {
+  const y = whiteOverlay.scrollTop || 0;
+  closeButton.style.setProperty("--scrollY", y + "px");
+}
+
+let rectExpanded = false;
+let rectAnimating = false;
+let selectedRect = null;
+let savedTransforms = new Map();
+
+function resetOverlayGrid() {
+  whiteOverlay.classList.remove("closing", "expanded", "expanding");
+  overlayTitle.classList.remove("fade-out", "quick");
+  closeButton.innerHTML = "&times;";
+  closeButton.setAttribute("aria-label", "Close overlay");
+  const rects = Array.from(rectGrid.querySelectorAll(".rect"));
+  rects.forEach((r) => {
+    r.classList.remove("selected");
+    r.style.transform = "";
+    r.style.opacity = "";
+  });
+  rectExpanded = false;
+  rectAnimating = false;
+  selectedRect = null;
+  savedTransforms.clear();
+  closeButton.style.setProperty("--scrollY", "0px");
+}
+
+function getRectCenterTopTarget() {
+  const gridBox = rectGrid.getBoundingClientRect();
+  const cs = getComputedStyle(rectGrid);
+  const padTop = parseFloat(cs.paddingTop) || 0;
+  return { x: gridBox.left + gridBox.width / 2, y: gridBox.top + padTop };
+}
+
+function expandRect(rect) {
+  if (rectAnimating || rectExpanded) return;
+  rectAnimating = true;
+  selectedRect = rect;
+  const rects = Array.from(rectGrid.querySelectorAll(".rect"));
+  rects.forEach((r) => savedTransforms.set(r, r.style.transform || ""));
+  whiteOverlay.classList.add("expanding");
+  rect.classList.add("selected");
+  const from = rect.getBoundingClientRect();
+  const gridBox = rectGrid.getBoundingClientRect();
+  const targetTopCenter = getRectCenterTopTarget();
+  const dx = targetTopCenter.x - (from.left + from.width / 2);
+  const dy = targetTopCenter.y - from.top;
+  const scaleX = gridBox.width / from.width;
+  const scaleY = gridBox.height / from.height;
+  rect.style.transform =
+    "translate3d(" +
+    dx +
+    "px, " +
+    dy +
+    "px, 0) scale(" +
+    scaleX +
+    ", " +
+    scaleY +
+    ")";
+  const onDone = (e) => {
+    if (e.propertyName !== "transform") return;
+    rect.removeEventListener("transitionend", onDone);
+    whiteOverlay.classList.remove("expanding");
+    whiteOverlay.classList.add("expanded");
+    closeButton.innerHTML = arrowUpSVG();
+    closeButton.setAttribute("aria-label", "Collapse");
+    rectExpanded = true;
+    rectAnimating = false;
+    syncCloseButtonY();
+  };
+  rect.addEventListener("transitionend", onDone, { once: true });
+}
+
+function reverseRectExpansion() {
+  if (rectAnimating || !rectExpanded) return;
+  rectAnimating = true;
+  const rects = Array.from(rectGrid.querySelectorAll(".rect"));
+  const rect = selectedRect;
+  const others = rects.filter((r) => r !== rect);
+  others.forEach((r) => {
+    r.style.transition = "none";
+    r.style.transform = savedTransforms.get(r) || "";
+    r.style.opacity = "1";
+  });
+  void rectGrid.offsetHeight;
+  others.forEach((r) => {
+    r.style.transition = "";
+  });
+  const original = savedTransforms.get(rect) || "";
+  rect.style.transform = original;
+  rect.style.opacity = "";
+  const onBack = (e) => {
+    if (e.propertyName !== "transform") return;
+    rect.removeEventListener("transitionend", onBack);
+    whiteOverlay.classList.remove("expanded");
+    rect.classList.remove("selected");
+    savedTransforms.clear();
+    closeButton.innerHTML = "&times;";
+    closeButton.setAttribute("aria-label", "Close overlay");
+    rectExpanded = false;
+    rectAnimating = false;
+    syncCloseButtonY();
+  };
+  rect.addEventListener("transitionend", onBack, { once: true });
+}
+
+rectGrid.addEventListener("click", (e) => {
+  if (rectAnimating || rectExpanded) return;
+  const target = e.target.closest(".rect");
+  if (!target) return;
+  expandRect(target);
+});
+
+const closeOverlay = () => {
+  clearXTimer();
+  spinOnce(closeButton);
+  if (rectExpanded) {
+    reverseRectExpansion();
+    return;
+  }
+  const rects = rectGrid.querySelectorAll(".rect");
+  rects.forEach((r) => {
+    r.style.opacity = "";
+  });
+  overlayTitle.classList.add("quick");
+  overlayTitle.classList.add("fade-out");
+  whiteOverlay.classList.add("closing");
+  whiteOverlay.classList.remove("active");
+  closeButton.classList.remove("revealed");
+  setTimeout(() => {
+    closeButton.style.setProperty("--scrollY", "0px");
+  }, OVERLAY_FADE_MS);
+};
+
+whiteOverlay.addEventListener("transitionend", (e) => {
+  if (e.propertyName !== "opacity") return;
+  const isActive = whiteOverlay.classList.contains("active");
+  if (!isActive) {
+    closeButton.classList.remove("revealed");
+    if (rectExpanded || rectAnimating) {
+      reverseRectExpansion();
+      closeButton.innerHTML = "&times;";
+      closeButton.setAttribute("aria-label", "Close overlay");
+      whiteOverlay.classList.remove("expanded", "expanding");
+      rectExpanded = false;
+      rectAnimating = false;
+    }
+  }
+});
+
+whiteOverlay.addEventListener("scroll", syncCloseButtonY, { passive: true });
+closeButton && closeButton.addEventListener("pointerdown", () => spinOnce(closeButton));
+closeButton && closeButton.addEventListener("click", closeOverlay);
+closeButton &&
+  closeButton.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      spinOnce(closeButton);
+      closeOverlay();
+    }
+  });
+
+function hardAutoplaySeventh() {
+  const video = document.getElementById("seventhVideo");
+  if (!video) return;
+  video.muted = true;
+  video.defaultMuted = true;
+  video.setAttribute("muted", "");
+  video.setAttribute("playsinline", "");
+  video.setAttribute("webkit-playsinline", "");
+  video.setAttribute("x5-playsinline", "");
+  video.autoplay = true;
+  video.loop = true;
+  video.removeAttribute("controls");
+  const nudgePlay = () => {
+    const p = video.play();
+    if (p && p.catch) p.catch(() => {});
+  };
+  if (video.readyState < 1) video.load();
+  try {
+    if (video.currentTime === 0) video.currentTime = 0.001;
+  } catch (e) {}
+  nudgePlay();
+  const io = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((e) => {
+        if (e.isIntersecting) nudgePlay();
+      });
+    },
+    { threshold: 0.01 }
+  );
+  io.observe(video);
+}
+
+let wheelRotation = 0;
+let wheelRadius = 1200;
+let wheelCards = [];
+let wheelN = 0;
+let contentIndices = [];
+let spotlightInProgress = false;
+let wheelAnimating = false;
+let nextRotationTimeout = null;
+let pageVisible = true;
+let spotlightCount = 0;
+let currentAnimationFrame = null;
+let spotlightTimeouts = [];
+
+function getCardTransform(cardIndex, rotation) {
+  const baseAngle = (cardIndex / wheelN) * 360;
+  const currentAngle = baseAngle + rotation;
+  const angleRad = (currentAngle * Math.PI) / 180;
+  const x = Math.sin(angleRad) * wheelRadius;
+  const z = Math.cos(angleRad) * wheelRadius;
+  const rotateY = -currentAngle;
+  const rotateX = -5;
+  return {
+    transform:
+      "translate3d(" +
+      x +
+      "px, 0px, " +
+      -z +
+      "px) rotateY(" +
+      rotateY +
+      "deg) rotateX(" +
+      rotateX +
+      "deg)",
+    z,
+    x,
+    currentAngle: ((currentAngle % 360) + 360) % 360
+  };
+}
+
+function applyWheelTransforms() {
+  wheelCards.forEach((card, index) => {
+    const { transform, z } = getCardTransform(index, wheelRotation);
+    const zIndex = Math.round(z + 1000);
+    card.style.transform = transform;
+    card.style.zIndex = zIndex;
+  });
+}
+function easeInOutCubic(t) {
+  return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+}
+
+function animateWheelRotation(targetRotation, duration, callback) {
+  if (wheelAnimating) return;
+  if (wheelStopped) return;
+  if (pageFrozen) return;
+  wheelAnimating = true;
+  const startRotation = wheelRotation;
+  const rotationDelta = targetRotation - startRotation;
+  const startTime = performance.now();
+  function tick(currentTime) {
+    if (wheelStopped || pageFrozen) {
+      wheelAnimating = false;
+      currentAnimationFrame = null;
+      return;
+    }
+    const elapsed = currentTime - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    const easedProgress = easeInOutCubic(progress);
+    wheelRotation = startRotation + rotationDelta * easedProgress;
+    applyWheelTransforms();
+    if (progress < 1) {
+      currentAnimationFrame = requestAnimationFrame(tick);
+    } else {
+      wheelRotation = targetRotation;
+      applyWheelTransforms();
+      wheelAnimating = false;
+      currentAnimationFrame = null;
+      if (callback && !pageFrozen) callback();
+    }
+  }
+  currentAnimationFrame = requestAnimationFrame(tick);
+}
+
+function findFrontCardIndex() {
+  let bestIndex = 0;
+  let bestDist = Infinity;
+  wheelCards.forEach((card, index) => {
+    const { currentAngle } = getCardTransform(index, wheelRotation);
+    const dist = Math.min(currentAngle, 360 - currentAngle);
+    if (dist < bestDist) {
+      bestDist = dist;
+      bestIndex = index;
+    }
+  });
+  return bestIndex;
+}
+
+function findNextContentRotation() {
+  const anglePerCard = 360 / wheelN;
+  return anglePerCard;
+}
+
+function findPrevContentRotation() {
+  const anglePerCard = 360 / wheelN;
+  return -anglePerCard;
+}
+
+function clearNextRotation() {
+  if (nextRotationTimeout) {
+    clearTimeout(nextRotationTimeout);
+    nextRotationTimeout = null;
+  }
+}
+
+function rotateToNextContent() {
+  if (pageFrozen) return;
+  if (spotlightInProgress || wheelAnimating) return;
+  if (wheelStopped) return;
+  clearNextRotation();
+  const rotationAmount = findNextContentRotation();
+  let duration;
+  if (spotlightCount === 0) {
+    duration = 300 + (Math.abs(rotationAmount) / 30) * 20;
+  } else if (spotlightCount === 1) {
+    duration = 420 + (Math.abs(rotationAmount) / 26) * 26;
+  } else if (spotlightCount === 2) {
+    duration = 340 + (Math.abs(rotationAmount) / 30) * 22;
+  } else if (spotlightCount === 3) {
+    duration = 380 + (Math.abs(rotationAmount) / 28) * 24;
+  } else {
+    duration = 340 + (Math.abs(rotationAmount) / 30) * 22;
+  }
+  const targetRotation = wheelRotation + rotationAmount;
+  animateWheelRotation(targetRotation, duration, () => {
+    if (wheelStopped || pageFrozen) return;
+    const frontIdx = findFrontCardIndex();
+    const frontCard = wheelCards[frontIdx];
+    if (frontCard) {
+      spotlightCard(frontCard, () => {
+        if (!wheelStopped && !pageFrozen)
+          nextRotationTimeout = setTimeout(rotateToNextContent, 100);
+      });
+    } else {
+      if (!wheelStopped && !pageFrozen)
+        nextRotationTimeout = setTimeout(rotateToNextContent, 100);
+    }
+  });
+}
+
+function rotateToNextContentBackward() {
+  if (pageFrozen) return;
+  if (spotlightInProgress || wheelAnimating) return;
+  if (wheelStopped) return;
+  clearNextRotation();
+  const rotationAmount = findPrevContentRotation();
+  let duration;
+  if (spotlightCount === 0) {
+    duration = 300 + (Math.abs(rotationAmount) / 30) * 20;
+  } else if (spotlightCount === 1) {
+    duration = 420 + (Math.abs(rotationAmount) / 26) * 26;
+  } else {
+    duration = 340 + (Math.abs(rotationAmount) / 30) * 22;
+  }
+  const targetRotation = wheelRotation + rotationAmount;
+  animateWheelRotation(targetRotation, duration, () => {
+    if (wheelStopped || pageFrozen) return;
+    const frontIdx = findFrontCardIndex();
+    const frontCard = wheelCards[frontIdx];
+    if (frontCard) {
+      spotlightCard(frontCard, () => {
+        if (!wheelStopped && !pageFrozen)
+          nextRotationTimeout = setTimeout(rotateToNextContent, 100);
+      });
+    } else {
+      if (!wheelStopped && !pageFrozen)
+        nextRotationTimeout = setTimeout(rotateToNextContent, 100);
+    }
+  });
+}
+
+function spotlightCard(card, after) {
+  if (pageFrozen) return;
+  const inner = card.querySelector(".image-container-inner");
+  const media = inner ? inner.querySelector("img, video") : null;
+  // Only skip certain testimonials during intro video, not after strudel
+  if (
+    introVideo &&
+    introVideo.paused &&
+    !strudelHasEnded &&
+    media &&
+    media.tagName === "IMG" &&
+    (media.alt === "Fourth testimonial" || media.alt === "Fifth testimonial")
+  ) {
+    if (after) after();
+    return;
+  }
+  if (wheelStopped) return;
+  spotlightInProgress = true;
+  let GROW_DURATION, HOLD_DURATION, SHRINK_DURATION;
+  if (spotlightCount === 0) {
+    GROW_DURATION = 450;
+    HOLD_DURATION = 1200;
+    SHRINK_DURATION = 700;
+  } else if (spotlightCount === 1) {
+    GROW_DURATION = 850;
+    HOLD_DURATION = 1200;
+    SHRINK_DURATION = 950;
+  } else if (spotlightCount === 2) {
+    GROW_DURATION = 720;
+    HOLD_DURATION = 1000;
+    SHRINK_DURATION = 820;
+  } else if (spotlightCount === 3) {
+    GROW_DURATION = 720;
+    HOLD_DURATION = 1000;
+    SHRINK_DURATION = 760;
+  } else {
+    GROW_DURATION = 780;
+    HOLD_DURATION = 1100;
+    SHRINK_DURATION = 820;
+  }
+  if (media && media.tagName === "IMG" && media.alt === "Third testimonial") {
+    SHRINK_DURATION = Math.max(200, SHRINK_DURATION - 150);
+  }
+  if (!inner || !media) {
+    spotlightInProgress = false;
+    if (after) after();
+    return;
+  }
+  const prevZ = card.style.zIndex;
+  card.style.zIndex = "9999";
+  const currentHeight = media.offsetHeight;
+  const currentWidth = media.offsetWidth;
+  const targetHeight = Math.min(currentHeight * 3, window.innerHeight * 0.5);
+  const aspectRatio = currentWidth / currentHeight;
+  const targetWidth = targetHeight * aspectRatio;
+  const offsetX = -(targetWidth - currentWidth) / 2;
+  const offsetY = -(targetHeight - currentHeight) / 2;
+  
+  // Safari fix: use webkit prefix for transitions
+  media.style.webkitTransition =
+    "max-height " +
+    GROW_DURATION +
+    "ms ease-in-out, -webkit-transform " +
+    GROW_DURATION +
+    "ms ease-in-out";
+  media.style.transition =
+    "max-height " +
+    GROW_DURATION +
+    "ms ease-in-out, transform " +
+    GROW_DURATION +
+    "ms ease-in-out";
+  media.style.maxHeight = currentHeight + "px";
+  media.style.webkitTransform = "translate3d(0, 0, 0)";
+  media.style.transform = "translate3d(0, 0, 0)";
+  requestAnimationFrame(() => {
+    if (pageFrozen) return;
+    media.style.maxHeight = targetHeight + "px";
+    media.style.webkitTransform =
+      "translate3d(" + offsetX + "px, " + offsetY + "px, 350px)";
+    media.style.transform =
+      "translate3d(" + offsetX + "px, " + offsetY + "px, 350px)";
+  });
+  const timeout1 = setTimeout(() => {
+    if (pageFrozen) return;
+    media.style.webkitTransition =
+      "max-height " +
+      SHRINK_DURATION +
+      "ms ease-in-out, -webkit-transform " +
+      SHRINK_DURATION +
+      "ms ease-in-out";
+    media.style.transition =
+      "max-height " +
+      SHRINK_DURATION +
+      "ms ease-in-out, transform " +
+      SHRINK_DURATION +
+      "ms ease-in-out";
+    media.style.maxHeight = currentHeight + "px";
+    media.style.webkitTransform = "translate3d(0, 0, 0)";
+    media.style.transform = "translate3d(0, 0, 0)";
+    const timeout2 = setTimeout(() => {
+      if (pageFrozen) return;
+      media.style.maxHeight = "";
+      media.style.transition = "";
+      media.style.webkitTransition = "";
+      media.style.transform = "";
+      media.style.webkitTransform = "";
+      card.style.zIndex = prevZ;
+      spotlightInProgress = false;
+      spotlightCount++;
+      if (pendingDirection) {
+        const dir = pendingDirection;
+        pendingDirection = null;
+        wheelStopped = false;
+        if (dir === "left") {
+          rotateToNextContentBackward();
+        } else {
+          rotateToNextContent();
+        }
+        return;
+      }
+      if (wheelShouldStopAfterSpotlight) {
+        wheelStopped = true;
+        clearNextRotation();
+        return;
+      }
+      if (after) after();
+    }, SHRINK_DURATION);
+    spotlightTimeouts.push(timeout2);
+  }, GROW_DURATION + HOLD_DURATION);
+  spotlightTimeouts.push(timeout1);
+}
+
+function layoutCircularWheel() {
+  const row = document.querySelector(".images-row");
+  wheelCards = Array.from(document.querySelectorAll(".image-container"));
+  if (!row || wheelCards.length === 0) return;
+  wheelN = wheelCards.length;
+  wheelRotation = 0;
+  contentIndices = [];
+  wheelCards.forEach((card, idx) => {
+    if (card.classList.contains("has-content")) contentIndices.push(idx);
+  });
+  
+  // Safari fix: Get the actual center of the images-row container
+  const rowRect = row.getBoundingClientRect();
+  const centerX = rowRect.width / 2;
+  
+  wheelCards.forEach((card) => {
+    // Position cards relative to the center of the row
+    card.style.left = centerX + "px";
+    card.style.top = "50%";
+    card.style.marginLeft = "-5rem"; // Offset for card width
+  });
+  applyWheelTransforms();
+}
+
+document.addEventListener("visibilitychange", () => {
+  pageFrozen = document.hidden;
+  if (pageFrozen) {
+    document.querySelectorAll("video").forEach((v) => v.pause());
+    const strudelFrame = document.getElementById("strudelFrame");
+    if (strudelFrame && strudelIsPlaying && strudelFrame.src !== "about:blank") {
+      strudelFrame.dataset.originalSrc = strudelFrame.src;
+      strudelFrame.src = "about:blank";
+    }
+  } else {
+    const introVid = document.getElementById("introVideo");
+    const wheelHasSlidUp =
+      document.getElementById("testimonialWidget").classList.contains("slide-up");
+    if (
+      introVid &&
+      wheelInitialized &&
+      !wheelHasSlidUp &&
+      introVid.currentTime >= 9 &&
+      introVid.currentTime < 29
+    ) {
+      clearNextRotation();
+      spotlightTimeouts.forEach((t) => clearTimeout(t));
+      spotlightTimeouts = [];
+      if (currentAnimationFrame) {
+        cancelAnimationFrame(currentAnimationFrame);
+        currentAnimationFrame = null;
+      }
+      document
+        .querySelectorAll(".image-container-inner img, .image-container-inner video")
+        .forEach((media) => {
+          media.style.maxHeight = "";
+          media.style.transition = "";
+          media.style.webkitTransition = "";
+          media.style.transform = "";
+          media.style.webkitTransform = "";
+        });
+      wheelAnimating = false;
+      spotlightInProgress = false;
+      spotlightCount = 0;
+      wheelRotation = 0;
+      wheelCards.forEach((card) => {
+        card.style.opacity = "0";
+      });
+      introVid.currentTime = 9;
+      applyWheelTransforms();
+      setTimeout(() => {
+        const cardsWithPositions = wheelCards.map((container, index) => {
+          const { x } = getCardTransform(index, wheelRotation);
+          return { container, x };
+        });
+        cardsWithPositions.sort((a, b) => a.x - b.x);
+        const STAGGER_MS = 30;
+        cardsWithPositions.forEach(({ container }, sortedIndex) => {
+          container.style.transition = "opacity 0.5s ease-out";
+          setTimeout(() => {
+            container.style.opacity = "1";
+          }, sortedIndex * STAGGER_MS);
+        });
+        introVid.play().catch(() => {});
+        setTimeout(() => {
+          if (pageFrozen || wheelStopped) return;
+          const frontIdx = findFrontCardIndex();
+          const frontCard = wheelCards[frontIdx];
+          if (frontCard) {
+            spotlightCard(frontCard, () => {
+              if (!pageFrozen && !wheelStopped)
+                nextRotationTimeout = setTimeout(rotateToNextContent, 100);
+            });
+          } else {
+            rotateToNextContent();
+          }
+        }, 50);
+      }, 100);
+    } else {
+      document.querySelectorAll("video").forEach((v) =>
+        v.play().catch(() => {})
+      );
+    }
+    const strudelFrame = document.getElementById("strudelFrame");
+    if (strudelFrame && strudelIsPlaying && !strudelHasEnded) {
+      if (strudelFrame.src === "about:blank" || !strudelFrame.src) {
+        strudelFrame.src = strudelOriginalSrc;
+        strudelFrame.onload = function () {
+          setTimeout(() => {
+            if (strudelFrame.contentWindow) {
+              strudelFrame.contentWindow.postMessage("startStrudel", "*");
+              strudelFrame.contentWindow.postMessage({ type: "setMoodSlider", value: currentMoodValue }, "*");
+            }
+          }, 500);
+        };
+      } else if (strudelFrame.contentWindow) {
+        strudelFrame.contentWindow.postMessage("startStrudel", "*");
+        strudelFrame.contentWindow.postMessage({ type: "setMoodSlider", value: currentMoodValue }, "*");
+      }
+    }
+  }
+});
+
+function initializeWheel() {
+  const imageContainers = Array.from(document.querySelectorAll(".image-container"));
+  const row = document.querySelector(".images-row");
+  hardAutoplaySeventh();
+  if (!row || imageContainers.length === 0) return;
+  layoutCircularWheel();
+  const cardsWithPositions = imageContainers.map((container, index) => {
+    const { x } = getCardTransform(index, wheelRotation);
+    return { container, x };
+  });
+  cardsWithPositions.sort((a, b) => a.x - b.x);
+  const STAGGER_MS = 30;
+  cardsWithPositions.forEach(({ container }, sortedIndex) => {
+    container.style.visibility = "visible";
+    container.style.opacity = "0";
+    container.style.transition = "opacity 0.5s ease-out";
+    setTimeout(() => {
+      container.style.opacity = "1";
+    }, sortedIndex * STAGGER_MS);
+  });
+  // Start by spotlighting the front/center card, then rotate through all in order
+  nextRotationTimeout = setTimeout(() => {
+    if (wheelStopped) return;
+    const frontIdx = findFrontCardIndex();
+    const frontCard = wheelCards[frontIdx];
+    if (frontCard) {
+      spotlightCard(frontCard, () => {
+        if (pageVisible && !wheelStopped)
+          nextRotationTimeout = setTimeout(rotateToNextContent, 100);
+      });
+    } else {
+      rotateToNextContent();
+    }
+  }, 50);
+}
+
+const vibeSliderTrack = document.getElementById("vibe-slider-track");
+const vibeSliderThumb = document.getElementById("vibe-slider-thumb");
+const vibeSliderFill = document.getElementById("vibe-slider-fill");
+const vibeLabels = document.querySelectorAll(".vibe-label");
+let currentMoodValue = 0;
+let isDragging = false;
+
+function sendMoodToStrudel(value) {
+  const strudelFrame = document.getElementById("strudelFrame");
+  if (strudelFrame && strudelFrame.contentWindow) {
+    strudelFrame.contentWindow.postMessage(
+      { type: "setMoodSlider", value: value },
+      "*"
+    );
+  }
+}
+
+function updateVibeSliderPosition(value) {
+  currentMoodValue = Math.max(0, Math.min(100, value));
+  const percent = currentMoodValue;
+  if (vibeSliderThumb) vibeSliderThumb.style.left = percent + "%";
+  if (vibeSliderFill) vibeSliderFill.style.width = percent + "%";
+  vibeLabels.forEach((label) => {
+    const labelValue = parseInt(label.dataset.value);
+    const distance = Math.abs(currentMoodValue - labelValue);
+    if (distance < 17) {
+      label.classList.add("active");
+    } else {
+      label.classList.remove("active");
+    }
+  });
+  sendMoodToStrudel(currentMoodValue);
+}
+
+function getVibeValueFromEvent(e) {
+  if (!vibeSliderTrack) return 0;
+  const rect = vibeSliderTrack.getBoundingClientRect();
+  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  const x = clientX - rect.left;
+  const percent = (x / rect.width) * 100;
+  return Math.max(0, Math.min(100, percent));
+}
+
+if (vibeSliderTrack) {
+  vibeSliderTrack.addEventListener("mousedown", function (e) {
+    isDragging = true;
+    updateVibeSliderPosition(getVibeValueFromEvent(e));
+  });
+  vibeSliderTrack.addEventListener(
+    "touchstart",
+    function (e) {
+      isDragging = true;
+      updateVibeSliderPosition(getVibeValueFromEvent(e));
+    },
+    { passive: true }
+  );
+}
+if (vibeSliderThumb) {
+  vibeSliderThumb.addEventListener("mousedown", function (e) {
+    e.preventDefault();
+    isDragging = true;
+  });
+  vibeSliderThumb.addEventListener(
+    "touchstart",
+    function (e) {
+      isDragging = true;
+    },
+    { passive: true }
+  );
+}
+document.addEventListener("mousemove", function (e) {
+  if (!isDragging) return;
+  updateVibeSliderPosition(getVibeValueFromEvent(e));
+});
+document.addEventListener(
+  "touchmove",
+  function (e) {
+    if (!isDragging) return;
+    updateVibeSliderPosition(getVibeValueFromEvent(e));
+  },
+  { passive: true }
+);
+document.addEventListener("mouseup", function () {
+  isDragging = false;
+});
+document.addEventListener("touchend", function () {
+  isDragging = false;
+});
+vibeLabels.forEach((label) => {
+  label.addEventListener("click", function () {
+    const value = parseInt(this.dataset.value);
+    updateVibeSliderPosition(value);
+  });
+});
+
+// ============ BULLETPROOF CLICK BLOCKING ============
+// This flag is the ONLY way to allow the button click
+let buttonClickAllowed = false;
+
+// Block ALL clicks on the intro video container at JavaScript level
+const introVideoContainerBlock = document.getElementById("introVideoContainer");
+if (introVideoContainerBlock) {
+  ['click', 'mousedown', 'mouseup', 'touchstart', 'touchend', 'pointerdown', 'pointerup'].forEach(eventType => {
+    introVideoContainerBlock.addEventListener(eventType, function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
+      return false;
+    }, true); // Capture phase
+  });
+}
+
+// Block clicks on vibe-chat-widget body (not the button)
+const vibeChatBody = document.getElementById("vibe-chat-body");
+const vibeChatMessage = document.getElementById("vibe-chat-message");
+if (vibeChatBody) {
+  ['click', 'mousedown', 'mouseup', 'touchstart', 'touchend', 'pointerdown', 'pointerup'].forEach(eventType => {
+    vibeChatBody.addEventListener(eventType, function(e) {
+      // Only allow if clicking the actual button
+      if (e.target.id === 'vibeTriggerButton') {
+        return; // Allow button clicks through
+      }
+      e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
+      return false;
+    }, true);
+  });
+}
+if (vibeChatMessage) {
+  ['click', 'mousedown', 'mouseup', 'touchstart', 'touchend', 'pointerdown', 'pointerup'].forEach(eventType => {
+    vibeChatMessage.addEventListener(eventType, function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
+      return false;
+    }, true);
+  });
+}
+
+// DOCUMENT-LEVEL CLICK INTERCEPTOR
+// This catches ALL clicks and only allows the button through when conditions are right
+document.addEventListener('click', function(e) {
+  // If clicking the arrow button
+  if (e.target.id === 'vibeTriggerButton' || e.target.closest('#vibeTriggerButton')) {
+    // Check if button click is allowed
+    if (!buttonClickAllowed) {
+      console.log("Document interceptor: button click NOT allowed yet");
+      e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
+      return false;
+    }
+    // Otherwise allow it through
+    return;
+  }
+  
+  // Block clicks on video container area
+  if (e.target.closest('#introVideoContainer') || e.target.closest('#vibe-chat-widget')) {
+    if (e.target.id !== 'vibeTriggerButton') {
+      e.preventDefault();
+      e.stopPropagation();
+      return false;
+    }
+  }
+}, true); // Capture phase - runs BEFORE other handlers
+
+// Arrow button to trigger Strudel - ONLY way to start it
+const vibeTriggerButton = document.getElementById("vibeTriggerButton");
+if (vibeTriggerButton) {
+  vibeTriggerButton.addEventListener("click", function (e) {
+    // CRITICAL: Triple-check all conditions
+    if (!buttonClickAllowed) {
+      console.log("Button handler: buttonClickAllowed is false");
+      e.preventDefault();
+      e.stopPropagation();
+      return false;
+    }
+    
+    if (!elementsShownAt29) {
+      console.log("Button handler: elementsShownAt29 is false");
+      e.preventDefault();
+      e.stopPropagation();
+      return false;
+    }
+    
+    const vibeChatWidget = document.getElementById("vibe-chat-widget");
+    if (!vibeChatWidget || !vibeChatWidget.classList.contains("visible")) {
+      console.log("Button handler: widget not visible");
+      e.preventDefault();
+      e.stopPropagation();
+      return false;
+    }
+    
+    // All checks passed - trigger the start
+    console.log("Button click ALLOWED - triggering vibe start");
+    triggerVibeStart();
+  }, false); // Bubble phase
+}
+
+</script>
+</body>
+</html>
