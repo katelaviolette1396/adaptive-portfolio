@@ -1,4 +1,4 @@
-# Adaptive Portfolio
+# Adaptive Portfolio - *Work in Progress*
 
 An experimental portfolio that detects behavioral patterns through user interaction and generates personalized audiovisual experiences.
 
